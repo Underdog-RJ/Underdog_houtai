@@ -15,5 +15,5 @@ public class RegisterVo {
     private String password;
 
     @ApiModelProperty(value = "验证码")
-    private String code;
+        private String code;
 }
