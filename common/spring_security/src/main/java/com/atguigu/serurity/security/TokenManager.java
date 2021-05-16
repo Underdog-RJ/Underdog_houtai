@@ -21,10 +21,14 @@ public class TokenManager {
     private long tokenExpiration = 24*60*60*1000;
     private String tokenSignKey = "123456";
 
-    public String createToken(String username) {
-        String token = Jwts.builder().setSubject(username)
+    public String createToken(String username,String id) {
+        String token = Jwts.builder()
+                .setSubject(username)
+                .claim("nickname",username)
+                .claim("id",id)
                 .setExpiration(new Date(System.currentTimeMillis() + tokenExpiration))
-                .signWith(SignatureAlgorithm.HS512, tokenSignKey).compressWith(CompressionCodecs.GZIP).compact();
+                .signWith(SignatureAlgorithm.HS512, tokenSignKey)
+                .compressWith(CompressionCodecs.GZIP).compact();
         return token;
     }
 

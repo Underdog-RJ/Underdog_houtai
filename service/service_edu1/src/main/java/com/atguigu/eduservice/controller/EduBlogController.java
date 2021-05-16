@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -64,9 +65,10 @@ public class EduBlogController {
     @PostMapping("addBlogInfo")
     public R addBlogInfo(@RequestBody EduBlog eduBlog,HttpServletRequest request){
 
-        String user = JwtUtils.getUserIdByJwtToken(request);
+        Map<String,String> user = JwtUtils.getUserIdByJwtToken(request);
 
-        eduBlog.setAuthorId(user);
+        eduBlog.setAuthorId(user.get("id"));
+        eduBlog.setAuthorNickname(user.get("nickname"));
         eduBlog.setPublished(true);
         eduBlog.setRecommend(true);
         eduBlog.setAppreciation(true);
@@ -76,6 +78,18 @@ public class EduBlogController {
         eduBlogService.save(eduBlog);
         return R.ok();
     }
+    @PostMapping("getBlogByUserId")
+    public R getBlogByUserId(HttpServletRequest request){
+        String token = request.getHeader("token");
+        if(!StringUtils.isEmpty(token)){
+            Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
+            String id = userIdByJwtToken.get("id");
+            List<EduBlog> list=eduBlogService.getBlogByUserId(id);
+            return R.ok().data("list",list);
+        }
+       return R.ok();
+    }
+
     //修改博客
     @PostMapping("updateBlogInfo")
     public R updateBlogInfo(@RequestBody EduBlog eduBlog){
@@ -86,8 +100,9 @@ public class EduBlogController {
         }else {
             return R.error();
         }
-
     }
+
+
 
 
 }

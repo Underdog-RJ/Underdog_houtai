@@ -31,7 +31,7 @@ public class User implements Serializable {
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
-    @ApiModelProperty(value = "微信openid")
+
     private String username;
 
     @ApiModelProperty(value = "密码")

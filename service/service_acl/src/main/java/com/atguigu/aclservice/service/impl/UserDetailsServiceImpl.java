@@ -52,6 +52,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<String> authorities = permissionService.selectPermissionValueByUserId(user.getId());
         SecurityUser securityUser = new SecurityUser(curUser);
         securityUser.setPermissionValueList(authorities);
+        securityUser.setId(user.getId());
         return securityUser;
     }
 

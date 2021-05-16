@@ -29,6 +29,9 @@ public class SecurityUser implements UserDetails {
     //当前权限
     private List<String> permissionValueList;
 
+    //当前用户id
+    private String id;
+
     public SecurityUser() {
     }
 

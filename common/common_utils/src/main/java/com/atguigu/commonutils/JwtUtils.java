@@ -9,6 +9,8 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author helen
@@ -83,14 +85,17 @@ public class JwtUtils {
         return (String)claims.get("id");
     }
 
-    public static String getUserIdByJwtToken(HttpServletRequest request) {
+    public static Map<String,String> getUserIdByJwtToken(HttpServletRequest request) {
          String jwtToken = request.getHeader("token");
 
-        if(StringUtils.isEmpty(jwtToken)) return "";
+        if(StringUtils.isEmpty(jwtToken)) return null;
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(jwtToken);
 
         Claims claims = claimsJws.getBody();
-        String subject = claims.getSubject();
-        return subject;
+
+        Map<String,String> map=new HashMap<>();
+        map.put("id",(String) claims.get("id"));
+        map.put("nickname",(String) claims.get("nickname"));
+        return map;
     }
 }

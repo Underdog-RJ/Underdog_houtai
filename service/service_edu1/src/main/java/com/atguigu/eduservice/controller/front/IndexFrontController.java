@@ -2,8 +2,10 @@ package com.atguigu.eduservice.controller.front;
 
 
 import com.atguigu.commonutils.R;
+import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.entity.EduCourse;
 import com.atguigu.eduservice.entity.EduTeacher;
+import com.atguigu.eduservice.service.EduBlogService;
 import com.atguigu.eduservice.service.EduCourseService;
 import com.atguigu.eduservice.service.EduTeacherService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,9 @@ public class IndexFrontController {
 
     @Autowired
     private EduTeacherService eduTeacherService;
+
+    @Autowired
+    private EduBlogService eduBlogService;
 
     //查询前8条热门记录，查询前4条名师
     @GetMapping("index")
@@ -40,7 +46,15 @@ public class IndexFrontController {
         wrapperTeacher.last("limit 4");
         List<EduTeacher> teacherList = eduTeacherService.list(wrapperTeacher);
 
-        return R.ok().data("eduList",eduList).data("teacherList",teacherList);
+        //查询前8条热门微博
+        QueryWrapper<EduBlog> wrapperBlog=new QueryWrapper<>();
+        wrapperBlog.orderByDesc("id");
+        wrapperBlog.last("limit 8");
+
+        List<EduBlog> blogList = eduBlogService.list(wrapperBlog);
+
+        return R.ok().data("eduList",eduList).data("teacherList",teacherList).data("blogList",blogList);
     }
+
 
 }

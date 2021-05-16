@@ -113,4 +113,13 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         map.put("hasPrevious", hasPrevious);
         return map;
     }
+
+    @Override
+    public List<EduBlog> getBlogByUserId(String id) {
+
+        return eduBlogMapper.getBlogByUserId(id);
+
+    }
+
+
 }

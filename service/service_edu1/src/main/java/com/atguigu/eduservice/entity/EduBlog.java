@@ -34,6 +34,8 @@ public class EduBlog implements Serializable {
 
     private String authorId;
 
+    private String authorNickname;
+
     private String descption;
 
     private String subjectId;

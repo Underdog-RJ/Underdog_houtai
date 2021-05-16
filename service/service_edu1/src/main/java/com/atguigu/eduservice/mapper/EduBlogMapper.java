@@ -4,6 +4,8 @@ import com.atguigu.eduservice.entity.EduBlog;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -14,5 +16,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface EduBlogMapper extends BaseMapper<EduBlog> {
+
+    List<EduBlog> getBlogByUserId(String id);
+
 
 }
