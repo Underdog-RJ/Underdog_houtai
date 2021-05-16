@@ -39,7 +39,6 @@ public class BlogFontController {
         Map<String,Object> map=eduBlogService.findBypageFront(page, limit, blogQuery);
         //返回分页所有数据
         return R.ok().data(map);
-
     }
 
     //2博客详情的方法

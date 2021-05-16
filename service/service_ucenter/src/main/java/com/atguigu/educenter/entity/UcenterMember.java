@@ -45,7 +45,7 @@ public class UcenterMember implements Serializable {
     @ApiModelProperty(value = "昵称")
     private String nickname;
 
-    @ApiModelProperty(value = "性别 1 女，2 男")
+    @ApiModelProperty(value = "性别 2 女，1 男")
     private Integer sex;
 
     @ApiModelProperty(value = "年龄")
@@ -70,6 +70,10 @@ public class UcenterMember implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
+
+    private String address;
+
+    private String signature;
 
 
 }

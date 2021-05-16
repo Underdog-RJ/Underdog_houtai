@@ -1,6 +1,7 @@
 package com.atguigu.educenter.controller;
 
 import com.atguigu.commonutils.JwtUtils;
+import com.atguigu.commonutils.R;
 import com.atguigu.educenter.entity.UcenterMember;
 import com.atguigu.educenter.service.UcenterMemberService;
 import com.atguigu.educenter.utils.ConstantWxUtils;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.UnsupportedEncodingException;
@@ -94,9 +96,12 @@ public class WxApiController {
         } catch (Exception e) {
             throw new GuliException(20001,"登陆失败");
         }
-
-
     }
+
+
+
+
+
 
     //1 生成微信扫描二维码
     @GetMapping("login")
