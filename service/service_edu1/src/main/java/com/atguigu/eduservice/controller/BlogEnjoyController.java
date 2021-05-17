@@ -33,9 +33,6 @@ public class BlogEnjoyController {
     @Autowired
     public BlogEnjoyService blogEnjoyService;
 
-
-
-
     //添加收藏
     @GetMapping("enjoyBlog/{id}")
     public R blogEnjoy(@PathVariable String id, HttpServletRequest request){

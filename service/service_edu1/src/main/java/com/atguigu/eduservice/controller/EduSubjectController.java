@@ -2,6 +2,7 @@ package com.atguigu.eduservice.controller;
 
 
 import com.atguigu.eduservice.entity.subject.OneSubject;
+import com.atguigu.eduservice.entity.subject.TwoSubject;
 import com.atguigu.eduservice.service.EduSubjectService;
 import com.atguigu.commonutils.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,14 @@ public class EduSubjectController {
     public R getAllSubject(){
         //list集合反省是一级分类
         List<OneSubject> list=subjectService.getAllOneTwoSubject();
+        return R.ok().data("list",list);
+    }
+
+
+    //获取所有二级分类
+    @GetMapping("getTwoAllSucject")
+    public R getTwoAllSucject(){
+        List<TwoSubject> list=subjectService.getTwoAllSucject();
         return R.ok().data("list",list);
     }
 

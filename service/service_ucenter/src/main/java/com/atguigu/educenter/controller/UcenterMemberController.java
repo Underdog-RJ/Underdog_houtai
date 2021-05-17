@@ -82,7 +82,7 @@ public class UcenterMemberController {
                 //拼接连个参数
                 String userInfoUrl = String.format(
                         baseUserInfoUrl,
-                        access_token,
+                access_token,
                         openid
                 );
                 //发送请求

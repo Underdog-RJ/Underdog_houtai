@@ -45,6 +45,8 @@ public class BlogFontController {
     @GetMapping("getFrontBlogInfo/{id}")
     public R getFrontCourseInfo(@PathVariable("id") String courseId){
         EduBlog byId = eduBlogService.getById(courseId);
+        byId.setViewCount(byId.getViewCount()+1);
+        eduBlogService.updateById(byId);
         return R.ok().data("eduBlog", byId);
 
     }

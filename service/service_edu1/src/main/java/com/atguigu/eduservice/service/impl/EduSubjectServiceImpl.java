@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -88,5 +89,18 @@ public class EduSubjectServiceImpl extends ServiceImpl<EduSubjectMapper, EduSubj
 
         }
         return finalSubjectList;
+    }
+
+    @Override
+    public List<TwoSubject> getTwoAllSucject() {
+        QueryWrapper<EduSubject> wrapper=new QueryWrapper<>();
+        wrapper.ne("parent_id","0");
+        List<EduSubject> eduSubjects = baseMapper.selectList(wrapper);
+        List<TwoSubject> twoSubjectList = eduSubjects.stream().map(eduSubject ->
+                {
+                    return new TwoSubject(eduSubject.getId(), eduSubject.getTitle());
+                }
+        ).collect(Collectors.toList());
+        return twoSubjectList;
     }
 }
