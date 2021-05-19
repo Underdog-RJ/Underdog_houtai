@@ -1,7 +1,9 @@
-package com.atguigu.eduservice.service;
+package com.atguigu.educenter.service;
 
-import com.atguigu.eduservice.entity.TbFriendReq;
+
+import com.atguigu.educenter.entity.TbFriendReq;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.stereotype.Service;
 
 /**
  * <p>
@@ -11,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author Zhang zhengxu
  * @since 2021-05-18
  */
+
 public interface TbFriendReqService extends IService<TbFriendReq> {
 
 }

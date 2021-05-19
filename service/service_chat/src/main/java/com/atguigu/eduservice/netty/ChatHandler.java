@@ -1,6 +1,8 @@
 package com.atguigu.eduservice.netty;
 
 
+import com.alibaba.fastjson.JSON;
+import com.atguigu.eduservice.entity.Message;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -25,16 +27,22 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-mm-dd hh:MM");
 
     //当Channel中有新的事件消息后会自动调用
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         //  当接收到数据后自动调用
 
         //  获取客户端发过来的文本消息
         String text = msg.text();
         System.out.println("接受到消息数据为："+text);
 
-        for (Channel client : clients) {
-            // 将消息发送到所有的客户端
-            client.writeAndFlush(new TextWebSocketFrame(sdf.format(new Date())+":"+text));
+        Message message = JSON.parseObject(text, Message.class);
+        switch (message.getType()){
+            case "1":
+                //建立用户与通道的关联
+                String userId = message.getTbChatRecord().getUserId();
+                UserChannelMap.put(userId,ctx.channel());
+                System.out.println("建立用户:"+userId+"与通道"+ctx.channel().id()+"的关联");
+
+                break;
         }
     }
 

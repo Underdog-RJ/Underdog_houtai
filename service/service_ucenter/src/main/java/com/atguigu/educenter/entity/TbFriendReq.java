@@ -1,7 +1,10 @@
-package com.atguigu.eduservice.entity;
+package com.atguigu.educenter.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -36,9 +39,13 @@ public class TbFriendReq implements Serializable {
     @ApiModelProperty(value = "被请求好友用户id")
     private String toUserid;
 
-    @ApiModelProperty(value = "请求时间")
-    private Date createtime;
+    @ApiModelProperty(value = "创建时间")
+    @TableField(fill = FieldFill.INSERT)
+    private Date gmtCreate;
 
+    @ApiModelProperty(value = "更新时间")
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date gmtModified;
     @ApiModelProperty(value = "发送的消息")
     private String message;
 

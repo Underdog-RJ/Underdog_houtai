@@ -9,6 +9,7 @@ import com.atguigu.educenter.service.UcenterMemberService;
 import com.atguigu.educenter.utils.ConstantWxUtils;
 import com.atguigu.educenter.utils.HttpClientUtils;
 import com.atguigu.educenter.vo.RegisterVo;
+import com.atguigu.educenter.vo.UcentmentberVo;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.google.gson.Gson;
 import org.springframework.beans.BeanUtils;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>
@@ -150,6 +152,70 @@ public class UcenterMemberController {
         Integer count=ucenterMemberService.countRegister(day);
         return R.ok().data("countRegister",count);
     }
+
+    /**
+     * 搜索用户
+     * @param nickname
+     * @param request
+     * @return
+     */
+    @GetMapping("getUserByName/{nickname}")
+    public R getUserByName(@PathVariable String nickname,HttpServletRequest request){
+        String memberId = JwtUtils.getMemberIdByJwtToken(request);
+        List<UcenterMember> list=ucenterMemberService.getUserByName(nickname,memberId);
+        return R.ok().data("list",list);
+    }
+
+    /**
+     * 添加用户
+     * @param friendid
+     * @param request
+     * @return
+     */
+    @GetMapping("addFriend/{friendid}")
+    public R addFriend(@PathVariable String friendid,HttpServletRequest request){
+        String memberId = JwtUtils.getMemberIdByJwtToken(request);
+        return ucenterMemberService.addFriend(friendid,memberId);
+    }
+
+    /**
+     * 根据用户id查询请求添加他的好友
+     * @param request
+     * @return
+     */
+    @GetMapping("findFriendReqByUserid")
+    public R findFriendReqByUserid(HttpServletRequest request){
+        String memberId = JwtUtils.getMemberIdByJwtToken(request);
+        List<UcentmentberVo> list= ucenterMemberService.findFriendReqByUserid(memberId);
+        return R.ok().data("list",list);
+    }
+
+    /**
+     * 同意添加对方为好友
+     */
+    @GetMapping("acceptFriendReq/{reqId}")
+    public R acceptFriendReq(@PathVariable String reqId){
+
+        return ucenterMemberService.acceptFriendReq(reqId);
+    }
+
+    /**
+     * 拒绝添加对方为好友
+     */
+    @GetMapping("ignoreFriendReq/{reqId}")
+    public R ignoreFriendReq(@PathVariable String reqId){
+        return ucenterMemberService.ignoreFriendReq(reqId);
+    }
+
+
+    @GetMapping("getAllFriendByUserId")
+    public R getAllFriendByUserId(HttpServletRequest request){
+        String memberId = JwtUtils.getMemberIdByJwtToken(request);
+        List<UcenterMember> list=ucenterMemberService.ucenterMemberService(memberId);
+        return R.ok().data("list",list);
+    }
+
+
 
 }
 

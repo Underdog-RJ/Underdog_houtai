@@ -1,7 +1,9 @@
-package com.atguigu.eduservice.mapper;
+package com.atguigu.educenter.mapper;
 
-import com.atguigu.eduservice.entity.TbFriendReq;
+
+import com.atguigu.educenter.entity.TbFriendReq;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -11,6 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author Zhang zhengxu
  * @since 2021-05-18
  */
+@Repository
 public interface TbFriendReqMapper extends BaseMapper<TbFriendReq> {
 
 }

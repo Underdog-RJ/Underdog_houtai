@@ -1,8 +1,12 @@
 package com.atguigu.educenter.service;
 
+import com.atguigu.commonutils.R;
 import com.atguigu.educenter.entity.UcenterMember;
 import com.atguigu.educenter.vo.RegisterVo;
+import com.atguigu.educenter.vo.UcentmentberVo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -21,4 +25,16 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     UcenterMember getOpenIdMember(String openid);
 
     Integer countRegister(String day);
+
+    List<UcenterMember> getUserByName(String nickname,String memberId);
+
+    R addFriend(String friendid, String memberId);
+
+    List<UcentmentberVo> findFriendReqByUserid(String memberId);
+
+    R acceptFriendReq(String reqId);
+
+    R ignoreFriendReq(String reqId);
+
+    List<UcenterMember> ucenterMemberService(String memberId);
 }

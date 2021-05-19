@@ -16,6 +16,11 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
     </dependency>
+    <dependency>
+        <groupId>com.atguigu</groupId>
+        <artifactId>service_chat</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
     <!--commons-io-->
     <dependency>
         <groupId>commons-io</groupId>
