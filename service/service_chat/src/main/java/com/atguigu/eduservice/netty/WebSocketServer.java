@@ -7,6 +7,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 @Component
 public class WebSocketServer {
 
@@ -15,8 +17,9 @@ public class WebSocketServer {
     private ServerBootstrap server;         // 服务器
     private ChannelFuture future;           // 回调
 
+    @PostConstruct
     public void start() {
-        future = server.bind(8011);
+        future = server.bind(8012);
         System.out.println("netty server - 启动成功");
     }
 

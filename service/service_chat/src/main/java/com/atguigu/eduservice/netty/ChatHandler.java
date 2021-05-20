@@ -36,12 +36,11 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 
         Message message = JSON.parseObject(text, Message.class);
         switch (message.getType()){
-            case "1":
+            case 0:
                 //建立用户与通道的关联
                 String userId = message.getTbChatRecord().getUserId();
                 UserChannelMap.put(userId,ctx.channel());
                 System.out.println("建立用户:"+userId+"与通道"+ctx.channel().id()+"的关联");
-
                 break;
         }
     }
