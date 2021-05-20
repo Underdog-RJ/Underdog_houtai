@@ -1,6 +1,7 @@
 package com.atguigu.eduservice.netty;
 
 import io.netty.channel.Channel;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,11 +29,28 @@ public class UserChannelMap {
 
 
     /**
-     * 移除用户id与channel的关联
+     * 根据移除用户id与channel的关联
      * @param userid
      */
     public static void remove(String userid){
         userChannelMap.remove(userid);
+    }
+
+    /**
+     * 根据通道id删除与channel的关联
+     */
+    public static void removeByChannelId(String channelId){
+        if(StringUtils.isEmpty(channelId)){
+            return;
+        }
+        for (String s : userChannelMap.keySet()) {
+            Channel channel = userChannelMap.get(s);
+            if(channelId.equals(channel.id().asLongText())){
+                System.out.println("客户端连接断开，取消用于："+s+"与通道"+channelId+"的关联");
+                userChannelMap.remove(s);
+                break;
+            }
+        }
     }
 
     /**
@@ -45,5 +63,12 @@ public class UserChannelMap {
     }
 
 
-
+    /**
+     * 根据好友id获取对应的通道
+     * @param friendId
+     * @return
+     */
+    public static Channel get(String friendId) {
+        return userChannelMap.get(friendId);
+    }
 }
