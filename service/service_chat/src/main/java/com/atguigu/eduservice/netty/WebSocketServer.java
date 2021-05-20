@@ -16,7 +16,7 @@ public class WebSocketServer {
     private ChannelFuture future;           // 回调
 
     public void start() {
-        future = server.bind(8011);
+        future = server.bind(8012);
         System.out.println("netty server - 启动成功");
     }
 
