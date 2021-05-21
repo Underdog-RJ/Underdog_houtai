@@ -38,5 +38,6 @@ public class WebsocketInitializer extends ChannelInitializer<SocketChannel> {
         // 添加自定义的handler
         pipeline.addLast(new ChatHandler());
 
+
     }
 }

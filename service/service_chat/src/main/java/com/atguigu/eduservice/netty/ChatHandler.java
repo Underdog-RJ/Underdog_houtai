@@ -26,6 +26,8 @@ import java.util.Date;
  */
 public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
+
+
     //  用来保留所有的客户端连接
     private static ChannelGroup clients=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 

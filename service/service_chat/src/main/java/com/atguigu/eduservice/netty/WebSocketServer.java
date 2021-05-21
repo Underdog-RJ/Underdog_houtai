@@ -18,10 +18,11 @@ public class WebSocketServer {
     private ChannelFuture future;           // 回调
 
     @PostConstruct
-    public void start() {
-        future = server.bind(8012);
+    public void start() throws InterruptedException {
+        future = server.bind(10010).sync();
         System.out.println("netty server - 启动成功");
     }
+
 
     public WebSocketServer() {
         bossGroup = new NioEventLoopGroup();
