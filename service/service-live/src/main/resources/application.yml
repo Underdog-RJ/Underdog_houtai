@@ -1,0 +1,40 @@
+
+
+#阿里云直播配置 begin
+#直播链接有效时间为24小时
+aliyun:
+  live:
+    push:
+      domain: 推流域名
+      ident:
+        key: 推流的key
+    pull:
+      domain: 拉流域名
+      ident:
+        key: 拉流的key
+    appName: 应用名称
+    streamName: 流名称
+    ident:
+      url:
+        validTime: 86400  #有效时间
+#阿里云直播配置 end
+
+#阿里云oss配置 begin
+oss:
+  bucketName: 空间名称
+  endpoint: 地址
+  accesKeyId: accesKeyId
+  accessKeySecret: accessKeySecret
+
+#阿里云oss配置 end
+
+server:
+  port: 8012
+
+spring:
+  application:
+    name: service-live
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 39.101.196.37:8848

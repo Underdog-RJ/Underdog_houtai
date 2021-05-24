@@ -80,6 +80,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         //   将新的通道加入到clients
+
         clients.add(ctx.channel());
     }
 

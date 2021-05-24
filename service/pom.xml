@@ -22,6 +22,7 @@
         <module>service_statistics</module>
         <module>service_acl</module>
         <module>service_chat</module>
+        <module>service-live</module>
     </modules>
     <dependencies>
         <dependency>
