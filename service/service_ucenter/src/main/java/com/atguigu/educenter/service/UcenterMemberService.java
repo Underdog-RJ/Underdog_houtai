@@ -37,4 +37,7 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     R ignoreFriendReq(String reqId);
 
     List<UcenterMember> ucenterMemberService(String memberId);
+
+    void addOwnPage(String memberId, UcenterMember ucenterMember);
+
 }

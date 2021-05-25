@@ -265,4 +265,12 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         List<UcenterMember> memberList = baseMapper.selectBatchIds(ids);
         return memberList;
     }
+
+
+    @Override
+    public void addOwnPage(String memberId, UcenterMember ucenterMember) {
+        UcenterMember ucenterMember1 = baseMapper.selectById(memberId);
+        ucenterMember1.setOwnpage(ucenterMember.getOwnpage());
+        baseMapper.updateById(ucenterMember1);
+    }
 }

@@ -44,7 +44,7 @@ public class UcenterShuoshuoController {
         //创建page对象
         //构造条件
         QueryWrapper<UcenterShuoshuo> wrapper=new QueryWrapper<>();
-         //System.out.println(userIdByJwtToken.get("徐可的id"+"id"));
+         //System.ou0t.println(userIdByJwtToken.get("徐可的id"+"id"));
         wrapper.eq("acl_user_id",userIdByJwtToken.get("id"));
         wrapper.orderByDesc("gmt_create");
         //调用方法实现条件查询分页

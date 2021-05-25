@@ -216,6 +216,13 @@ public class UcenterMemberController {
     }
 
 
+    @PostMapping("addOwnPage")
+    public R addOwnPage(HttpServletRequest request,@RequestBody UcenterMember ucenterMember){
+        String memberId = JwtUtils.getMemberIdByJwtToken(request);
+        ucenterMemberService.addOwnPage(memberId,ucenterMember);
+        return R.ok();
+    }
+
 
 }
 
