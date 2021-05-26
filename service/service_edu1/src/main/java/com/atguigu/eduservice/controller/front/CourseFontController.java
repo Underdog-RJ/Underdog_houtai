@@ -53,6 +53,13 @@ public class CourseFontController {
         //根据课程id，编写sql语句查询课程信息
         CourseWebVo courseWebVo=eduCourseService.getBaseCourseInfo(courseId);
 
+        courseWebVo.setViewCount(courseWebVo.getViewCount()+1);
+
+        EduCourse eduCourse=new EduCourse();
+        BeanUtils.copyProperties(courseWebVo,eduCourse);
+        eduCourseService.updateById(eduCourse);
+
+
         //根据课程Id查询章节和小节
         List<ChapterVo> chapterVideoList = eduChapterService.getChapterVideoByCourseId(courseId);
         String token = request.getHeader("token");
@@ -75,6 +82,15 @@ public class CourseFontController {
         CourseWebVoOrder courseWebVoOrder = new CourseWebVoOrder();
         BeanUtils.copyProperties(courseInfo,courseWebVoOrder);
         return courseWebVoOrder;
+    }
+
+    //根据课程Id更新课程的购买数量
+    @GetMapping("updateBuyCount/{id}")
+    public void updateBuyCount(@PathVariable String id)
+    {
+        EduCourse byId = eduCourseService.getById(id);
+        byId.setBuyCount(byId.getBuyCount()+1);
+        eduCourseService.updateById(byId);
     }
 
 
