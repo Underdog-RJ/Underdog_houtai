@@ -38,6 +38,6 @@ public interface UcenterMemberService extends IService<UcenterMember> {
 
     List<UcenterMember> ucenterMemberService(String memberId);
 
-    void addOwnPage(String memberId, UcenterMember ucenterMember);
 
+    boolean setMail(String userId, String mail);
 }
