@@ -4,12 +4,16 @@ package com.atguigu.educenter.controller;
 import com.atguigu.commonutils.R;
 import com.atguigu.educenter.entity.UcenterKecheng;
 import com.atguigu.educenter.entity.UcenterMember;
+import com.atguigu.educenter.entity.UcenterShuoshuo;
 import com.atguigu.educenter.service.UcenterKechengService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -50,12 +54,22 @@ public class UcenterKechengController{
     }
     //根据用户ID获得所有收藏
     @GetMapping("get_collect")
-    public R getCollectById(@RequestParam("userId") String userId){
-        QueryWrapper<UcenterKecheng> kechengQueryWrapper = new QueryWrapper<>();
-        kechengQueryWrapper.eq("user_id",userId);
-        List<UcenterKecheng> list = ucenterKechengService.list(kechengQueryWrapper);
-
-        return R.ok().data("list",list);
+    public R getCollectById(@PathVariable Long current,@PathVariable Long limit,@RequestParam("userId") String userId){
+        QueryWrapper<UcenterKecheng> wrapper = new QueryWrapper<>();
+        Page<UcenterKecheng> page=new Page<>(current,limit);
+        wrapper.eq("user_id",userId);
+        wrapper.orderByDesc("gmt_create");
+        ucenterKechengService.page(page, wrapper);
+        List<UcenterKecheng> records = page.getRecords();
+        Map<String, Object> map = new HashMap<>();
+        map.put("items", records);
+        map.put("current", page.getCurrent());
+        map.put("pages", page.getPages());
+        map.put("size", page.getSize());
+        map.put("total", page.getTotal());
+        map.put("hasNext", page.hasNext());
+        map.put("hasPrevious", page.hasPrevious());
+        return R.ok().data("map",map);
     }
 
 }
