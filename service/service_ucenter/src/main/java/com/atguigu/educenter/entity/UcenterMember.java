@@ -75,6 +75,8 @@ public class UcenterMember implements Serializable {
 
     private String signature;
 
-    private String ownpage;
+    private String mail;
+
+    private int mailType;
 
 }

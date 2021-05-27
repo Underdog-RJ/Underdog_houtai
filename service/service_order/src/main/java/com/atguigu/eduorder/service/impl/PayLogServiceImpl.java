@@ -1,6 +1,7 @@
 package com.atguigu.eduorder.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atguigu.eduorder.client.EduClient;
 import com.atguigu.eduorder.entity.Order;
 import com.atguigu.eduorder.entity.PayLog;
 import com.atguigu.eduorder.mapper.PayLogMapper;
@@ -32,6 +33,11 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private EduClient eduClient;
+
+
 
     //生成微信二维码
     @Override
@@ -127,6 +133,7 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
         //更行订单表的订单状态
         if(order.getStatus().intValue()==1) {return;}
         order.setStatus(1);//1代表已支付
+        eduClient.updateBuyCount( order.getCourseId());
         orderService.updateById(order);
 
         //向支付附表中添加支付记录

@@ -10,6 +10,7 @@ import com.atguigu.educenter.mapper.UcenterMemberMapper;
 import com.atguigu.educenter.service.TbFriendReqService;
 import com.atguigu.educenter.service.TbFriendService;
 import com.atguigu.educenter.service.UcenterMemberService;
+import com.atguigu.educenter.utils.MailUtils;
 import com.atguigu.educenter.vo.RegisterVo;
 
 import com.atguigu.educenter.vo.UcentmentberVo;
@@ -267,10 +268,17 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     }
 
 
+
+
     @Override
-    public void addOwnPage(String memberId, UcenterMember ucenterMember) {
-        UcenterMember ucenterMember1 = baseMapper.selectById(memberId);
-        ucenterMember1.setOwnpage(ucenterMember.getOwnpage());
-        baseMapper.updateById(ucenterMember1);
+    public boolean setMail(String userId, String mail) {
+        boolean flag = MailUtils.sendMail(mail, "儿子", "我是你爸爸");
+        if(flag==true){
+            UcenterMember ucenterMember = baseMapper.selectById(userId);
+            ucenterMember.setMail(mail);
+            ucenterMember.setMailType(0);
+            baseMapper.updateById(ucenterMember);
+        }
+        return flag;
     }
 }
