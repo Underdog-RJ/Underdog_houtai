@@ -6,6 +6,7 @@ import com.atguigu.commonutils.R;
 import com.atguigu.educenter.entity.TbFriend;
 import com.atguigu.educenter.entity.TbFriendReq;
 import com.atguigu.educenter.entity.UcenterMember;
+import com.atguigu.educenter.entity.UcenterVo;
 import com.atguigu.educenter.mapper.UcenterMemberMapper;
 import com.atguigu.educenter.service.TbFriendReqService;
 import com.atguigu.educenter.service.TbFriendService;
@@ -14,6 +15,7 @@ import com.atguigu.educenter.utils.MailUtils;
 import com.atguigu.educenter.vo.RegisterVo;
 
 import com.atguigu.educenter.vo.UcentmentberVo;
+import com.atguigu.eduservice.entity.UnReadMessage;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -280,5 +282,20 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             baseMapper.updateById(ucenterMember);
         }
         return flag;
+    }
+
+    @Override
+    public List<UcenterVo> getUserInfoByIds(List<UnReadMessage> list) {
+
+        List<UcenterVo> listResul=new ArrayList<>();
+        for (UnReadMessage unReadMessage : list) {
+            UcenterVo temp=new UcenterVo();
+            UcenterMember ucenterMember = baseMapper.selectById(unReadMessage.getName());
+            BeanUtils.copyProperties(ucenterMember,temp);
+            temp.setCount(unReadMessage.getCount());
+            listResul.add(temp);
+        }
+
+        return listResul;
     }
 }
