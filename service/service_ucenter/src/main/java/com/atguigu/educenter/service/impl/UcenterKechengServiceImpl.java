@@ -22,8 +22,10 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UcenterKechengServiceImpl extends ServiceImpl<UcenterKechengMapper, UcenterKecheng> implements UcenterKechengService {
+
     @Autowired
     UcenterKechengMapper ucenterKechengMapper;
+
     public IPage<EduCourse> pageList(Page<EduCourse> page, String userId){
         return ucenterKechengMapper.pageList(page,userId);
     };

@@ -29,7 +29,6 @@ public class EduComment implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty(value = "讲师ID")
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 

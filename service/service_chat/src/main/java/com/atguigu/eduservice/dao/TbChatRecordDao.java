@@ -10,7 +10,7 @@ public interface TbChatRecordDao extends MongoRepository<TbChatRecord,String> {
 
     List<TbChatRecord> findByUserIdAndFriendIdAndHasDeleteOrderByCreatetime(String userId,String friendId,Integer number);
 
-    List<TbChatRecord> findByUserIdAndHasRead(String userId,Integer integer);
+    List<TbChatRecord> findByFriendIdAndHasRead(String friendId,Integer integer);
 
 
 }

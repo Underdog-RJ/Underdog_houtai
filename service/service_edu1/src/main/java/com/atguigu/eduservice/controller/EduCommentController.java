@@ -43,13 +43,14 @@ public class EduCommentController {
     //根据课程id查询评论列表
     @GetMapping("{courseId}/{page}/{limit}")
     public R index(  @PathVariable String courseId,
-                    @PathVariable Long page,
+                     @PathVariable Long page,
                      @PathVariable  Long limit){
 
         Page<EduComment> pageParam = new Page<>(page, limit);
 
         QueryWrapper<EduComment> wrapper = new QueryWrapper<>();
         wrapper.eq("course_id",courseId);
+        wrapper.orderByDesc("gmt_create");
 
         eduCommentService.page(pageParam,wrapper);
         List<EduComment> EduCommentList = pageParam.getRecords();

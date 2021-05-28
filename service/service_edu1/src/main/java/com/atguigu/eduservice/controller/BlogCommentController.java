@@ -48,7 +48,7 @@ public class BlogCommentController {
 
         QueryWrapper<BlogComment> wrapper = new QueryWrapper<>();
         wrapper.eq("blog_id",blogId);
-
+        wrapper.orderByDesc("gmt_create");
         blogCommentService.page(pageParam,wrapper);
         List<BlogComment> EduCommentList = pageParam.getRecords();
 
