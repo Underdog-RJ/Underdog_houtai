@@ -22,4 +22,6 @@ import org.apache.ibatis.annotations.Param;
 public interface UcenterKechengMapper extends BaseMapper<UcenterKecheng> {
 
     IPage<EduCourse> pageList(Page<EduCourse> page, String userId);
+
+    IPage<EduCourse> pagePayList(Page<EduCourse> page, String userId);
 }

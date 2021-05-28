@@ -79,9 +79,8 @@ public class UcenterKechengController{
     //根据用户ID获得所有收藏
     @GetMapping("get_collect/{current}/{limit}")
     public R getCollectById(@PathVariable Long current,@PathVariable Long limit,HttpServletRequest request){
-//        Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
-//        String userId = userIdByJwtToken.get("id");
-        String userId="1395752429130080258";
+        Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
+        String userId = userIdByJwtToken.get("id");
         QueryWrapper<UcenterKecheng> wrapper = new QueryWrapper<>();
         Page<EduCourse> page=new Page<>(current,limit);
         wrapper.eq("user_id",userId);
@@ -96,8 +95,31 @@ public class UcenterKechengController{
         map.put("total", page.getTotal());
         map.put("hasNext", page.hasNext());
         map.put("hasPrevious", page.hasPrevious());
-        return R.ok().data("map",map);
+        return R.ok().data(map);
     }
-
+    @GetMapping("get_pay/{current}/{limit}")
+    public R getPayById(@PathVariable Long current,@PathVariable Long limit,HttpServletRequest request){
+        Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
+        String userId = userIdByJwtToken.get("id");
+        QueryWrapper<UcenterKecheng> wrapper = new QueryWrapper<>();
+        Page<EduCourse> page=new Page<>(current,limit);
+        wrapper.eq("user_id",userId);
+        wrapper.orderByDesc("gmt_create");
+        ucenterKechengService.pagePayList( page, userId);
+        List<EduCourse> records = page.getRecords();
+        for (EduCourse e:records
+             ) {
+            System.out.println("Educrouse++++:"+e.toString());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("items", records);
+        map.put("current", page.getCurrent());
+        map.put("pages", page.getPages());
+        map.put("size", page.getSize());
+        map.put("total", page.getTotal());
+        map.put("hasNext", page.hasNext());
+        map.put("hasPrevious", page.hasPrevious());
+        return R.ok().data(map);
+    }
 }
 

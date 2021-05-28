@@ -18,4 +18,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface UcenterKechengService extends IService<UcenterKecheng> {
 
     IPage<EduCourse> pageList(Page<EduCourse> page, String userId);
+
+    IPage<EduCourse> pagePayList(Page<EduCourse> page, String userId);
 }
