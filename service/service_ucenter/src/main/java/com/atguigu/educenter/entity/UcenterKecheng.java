@@ -1,4 +1,4 @@
-package com.atguigu.eduservice.entity;
+package com.atguigu.educenter.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -15,43 +15,29 @@ import lombok.experimental.Accessors;
 
 /**
  * <p>
- * 评论
+ * 
  * </p>
  *
  * @author Zhang zhengxu
- * @since 2021-01-31
+ * @since 2021-05-26
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="EduComment对象", description="评论")
-public class EduComment implements Serializable {
+@ApiModel(value="UcenterKecheng对象", description="")
+public class UcenterKecheng implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "主键")
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
-    @ApiModelProperty(value = "课程id")
+    @ApiModelProperty(value = "课程ID")
     private String courseId;
 
-    @ApiModelProperty(value = "讲师id")
-    private String teacherId;
-
-    @ApiModelProperty(value = "会员id")
-    private String memberId;
-
-    @ApiModelProperty(value = "会员昵称")
-    private String nickname;
-
-    @ApiModelProperty(value = "会员头像")
-    private String avatar;
-
-    @ApiModelProperty(value = "评论内容")
-    private String content;
-
-    @ApiModelProperty(value = "逻辑删除 1（true）已删除， 0（false）未删除")
-    private Boolean isDeleted;
+    @ApiModelProperty(value = "用户ID")
+    private String userId;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
@@ -60,6 +46,12 @@ public class EduComment implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
+
+    @ApiModelProperty(value = "删除标志位")
+    private Integer isDeleted;
+
+    @ApiModelProperty(value = "收藏标志位(0没有收藏，1已收藏)")
+    private Integer isCollect;
 
 
 }

@@ -51,7 +51,6 @@ public class UcenterShuoshuoController {
         long total = pageshuoshuo.getTotal();
         List<UcenterShuoshuo> records = pageshuoshuo.getRecords();
         Map<String, Object> map = new HashMap<>();
-
         map.put("items", records);
         map.put("current", pageshuoshuo.getCurrent());
         map.put("pages", pageshuoshuo.getPages());

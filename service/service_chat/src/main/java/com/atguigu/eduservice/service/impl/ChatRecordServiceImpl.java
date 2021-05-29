@@ -3,10 +3,12 @@ package com.atguigu.eduservice.service.impl;
 import com.atguigu.eduservice.dao.TbChatRecordDao;
 import com.atguigu.eduservice.entity.TbChatRecord;
 import com.atguigu.eduservice.entity.TbChatRecordVo;
+import com.atguigu.eduservice.entity.UnReadMessage;
 import com.atguigu.eduservice.service.ChatRecordService;
 import com.atguigu.eduservice.utils.IdWorker;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,28 +30,37 @@ public class ChatRecordServiceImpl implements ChatRecordService {
 
 
     /**
-     * 将聊天记录保存到数据库中
+     * 将用户发送给朋友的聊天记录保存到数据库中
      * @param chatRecord
      */
     @Override
     public void insert(TbChatRecord chatRecord) {
+
         chatRecord.setId(idWorker.nextId());
         chatRecord.setHasRead(0);
         chatRecord.setCreatetime(sdf.format(new Date()));
         chatRecord.setHasDelete(0);
-        TbChatRecord save = tbChatRecordDao.save(chatRecord);
-        System.out.println(save);
+       tbChatRecordDao.save(chatRecord);
     }
 
 
+    /**
+     * 获取全部聊天记录
+     * @param userid
+     * @param friendid
+     * @return
+     */
     @Override
     public List<TbChatRecordVo> findByUserIdAndFriendId(String userid, String friendid) {
         List<TbChatRecordVo> findList=new ArrayList<>();
-        List<TbChatRecord> userToFriend = tbChatRecordDao.findByUserIdAndFriendIdAndHasDeleteOrderByCreatetime(userid, friendid,0);
+        List<TbChatRecord> userToFriend = tbChatRecordDao
+                .findByUserIdAndFriendIdAndHasDeleteOrderByCreatetime(userid, friendid,0);
         for (TbChatRecord tbChatRecord : userToFriend) {
             findList.add(new TbChatRecordVo(1,tbChatRecord.getMessage(),tbChatRecord.getCreatetime()));
         }
-        List<TbChatRecord> friendToUser = tbChatRecordDao.findByUserIdAndFriendIdAndHasDeleteOrderByCreatetime(friendid,userid, 0);
+        List<TbChatRecord> friendToUser = tbChatRecordDao
+                .findByUserIdAndFriendIdAndHasDeleteOrderByCreatetime(friendid,userid, 0);
+
         /**
          * 更新或有聊天状态为已读
          */
@@ -67,12 +78,31 @@ public class ChatRecordServiceImpl implements ChatRecordService {
         return findList;
     }
 
+    /**
+     * 根据用户id获取未读消息
+     * @param userId
+     * @return
+     */
     @Override
-    public List<TbChatRecord> getRecordByUserId(String userId) {
+    public List<UnReadMessage> getRecordByUserId(String userId) {
 
-        List<TbChatRecord> list = tbChatRecordDao.findByUserIdAndHasRead(userId, 1);
+        List<TbChatRecord> list = tbChatRecordDao.findByFriendIdAndHasRead(userId, 0);
+        List<UnReadMessage> result=new ArrayList<>();
+        Map<String, Integer> map = new HashMap<>();
+        for (TbChatRecord tbChatRecord : list) {
+            if (map.containsKey(tbChatRecord.getUserId())) {
+                Integer number = map.get(tbChatRecord.getUserId());
+                map.put(tbChatRecord.getUserId(), ++number);
 
-        return list;
+            } else {
+                map.put(tbChatRecord.getUserId(), 1);
+            }
+        }
+        for (String temp : map.keySet()) {
+            result.add(new UnReadMessage(temp,map.get(temp)));
+        }
+
+        return result;
     }
 
     /**

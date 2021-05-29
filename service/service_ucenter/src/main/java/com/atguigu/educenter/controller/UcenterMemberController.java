@@ -5,11 +5,15 @@ import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.commonutils.order.UcenterMemberOrder;
 import com.atguigu.educenter.entity.UcenterMember;
+import com.atguigu.educenter.entity.UcenterMemberZhuye;
+import com.atguigu.educenter.entity.UcenterVo;
 import com.atguigu.educenter.service.UcenterMemberService;
+import com.atguigu.educenter.service.UcenterMemberZhuyeService;
 import com.atguigu.educenter.utils.ConstantWxUtils;
 import com.atguigu.educenter.utils.HttpClientUtils;
 import com.atguigu.educenter.vo.RegisterVo;
 import com.atguigu.educenter.vo.UcentmentberVo;
+import com.atguigu.eduservice.entity.UnReadMessage;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.google.gson.Gson;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +38,9 @@ public class UcenterMemberController {
 
     @Autowired
     private UcenterMemberService ucenterMemberService;
+
+    @Autowired
+    private UcenterMemberZhuyeService ucenterMemberZhuyeService;
 
     //登录
     @PostMapping("login")
@@ -217,10 +224,37 @@ public class UcenterMemberController {
 
 
     @PostMapping("addOwnPage")
-    public R addOwnPage(HttpServletRequest request,@RequestBody UcenterMember ucenterMember){
+    public R addOwnPage(HttpServletRequest request,@RequestBody UcenterMemberZhuye ucenterMemberZhuye){
         String memberId = JwtUtils.getMemberIdByJwtToken(request);
-        ucenterMemberService.addOwnPage(memberId,ucenterMember);
+        ucenterMemberZhuyeService.addOwnPage(memberId,ucenterMemberZhuye);
         return R.ok();
+    }
+
+
+    @GetMapping("getOwnPage")
+    public R getOwnPage(HttpServletRequest request){
+        String memberId = JwtUtils.getMemberIdByJwtToken(request);
+        UcenterMemberZhuye ucenterMemberZhuye=ucenterMemberZhuyeService.getOwnPage(memberId);
+        return R.ok().data("ucenterMemberZhuye",ucenterMemberZhuye);
+    }
+
+
+    @GetMapping("setOwnMail/{mail}")
+    public R setMail(@PathVariable String mail ,HttpServletRequest request){
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        boolean flag=ucenterMemberService.setMail(userId,mail);
+        return R.ok();
+    }
+
+
+    /**
+     * 根据批量用户ids查询用户信息
+     */
+    @PostMapping("getUserInfoByIds")
+    public R getUserInfoByIds(@RequestBody List<UnReadMessage> list){
+
+        List<UcenterVo> result =ucenterMemberService.getUserInfoByIds(list);
+        return R.ok().data("list",result);
     }
 
 

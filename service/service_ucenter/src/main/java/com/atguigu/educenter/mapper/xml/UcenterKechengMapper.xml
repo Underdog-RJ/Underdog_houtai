@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.educenter.mapper.UcenterKechengMapper">
+    <select id="pageList" resultType="com.atguigu.educenter.entity.EduCourse">
+SELECT
+		co.*
+FROM
+	edu_course co right join ucenter_kecheng uck
+	on co.id=uck.course_id
+	<where>
+		uck.user_id=${userId}
+	</where>
+
+    </select>
+	<select id="pagePayList" resultType="com.atguigu.educenter.entity.EduCourse">
+		SELECT
+		co.id,
+		co.price,
+		co.title,
+		co.cover
+		FROM
+		edu_course co right join t_order ord
+		on co.id=ord.course_id
+		<where>
+			ord.member_id=${userId}
+			and
+			ord.status='1'
+			and
+			co.id is not null
+		</where>
+	</select>
+</mapper>
