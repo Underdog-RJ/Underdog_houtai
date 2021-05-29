@@ -10,10 +10,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -37,20 +36,19 @@ public class UcenterShuoshuoController {
     //1 查询讲师表所有数据
     @GetMapping("page/{current}/{limit}")
     @ApiOperation(value = "分页查询本人说说")
-    public R findPageShuoshuo(@PathVariable Long current,@PathVariable Long limit,HttpServletRequest request){
-        Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
+    public R findPageShuoshuo(@PathVariable Long current,@PathVariable Long limit, @RequestParam("userId") String userId){
+//       Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
+        System.out.println("userID是："+userId);
         Page<UcenterShuoshuo> pageshuoshuo=new Page<>(current,limit);
         //调用service的方法实现查询所有的操作
         //创建page对象
         //构造条件
         QueryWrapper<UcenterShuoshuo> wrapper=new QueryWrapper<>();
-         //System.ou0t.println(userIdByJwtToken.get("徐可的id"+"id"));
-        wrapper.eq("acl_user_id",userIdByJwtToken.get("id"));
+        wrapper.eq("acl_user_id",userId);
         wrapper.orderByDesc("gmt_create");
         //调用方法实现条件查询分页
         ucenterShuoshuoService.page(pageshuoshuo, wrapper);
         long total = pageshuoshuo.getTotal();
-        System.out.println(pageshuoshuo.getRecords().get(0).getShuoshuo());
         List<UcenterShuoshuo> records = pageshuoshuo.getRecords();
         Map<String, Object> map = new HashMap<>();
 
@@ -66,8 +64,8 @@ public class UcenterShuoshuoController {
 
     //2.逻辑删除讲师的方法
     @DeleteMapping("{id}")
-    @ApiOperation(value = "逻辑删除讲师")
-    public R removeTeacher(@ApiParam(name = "id",value = "说说ID",required = true) @PathVariable String id){
+    @ApiOperation(value = "逻辑删除说说")
+    public R removeshuoshuo(@ApiParam(name = "id",value = "说说ID",required = true) @PathVariable String id){
         boolean flag = ucenterShuoshuoService.removeById(id);
         if(flag)
         {
@@ -78,7 +76,7 @@ public class UcenterShuoshuoController {
     }
     //添加课程分类
     @PostMapping("addshuoshuo")
-    public R addSubject(@RequestBody UcenterShuoshuo ucenterShuoshuo,HttpServletRequest request){
+    public R addShuoshuo(@RequestBody UcenterShuoshuo ucenterShuoshuo,HttpServletRequest request){
         System.out.println("方法执行了");
         Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
         ucenterShuoshuo.setAclUserId(userIdByJwtToken.get("id"));
@@ -87,16 +85,22 @@ public class UcenterShuoshuoController {
     }
 
 
-    //讲师修该功能
-//    @PostMapping("updateshuoshuo")
-//    public R updateTeacher(@RequestBody EduTeacher eduTeacher){
-//        boolean flag = teacherService.updateById(eduTeacher);
-//        if(flag){
-//            return R.ok();
-//        }else {
-//            return R.error();
-//        }
-//    }
+    //更改隐藏
+    @PostMapping("hide")
+    public R updateHide(@RequestBody Map map){
+        UcenterShuoshuo ucenterShuoshuo = new UcenterShuoshuo();
+        System.out.println("方法执行了");
+        System.out.println("id"+map.get("id").toString()+"isHide:"+map.get("isHide"));
+        ucenterShuoshuo.setId(map.get("id").toString());
+        ucenterShuoshuo.setIsHide(Integer.valueOf(map.get("isHide").toString()));
+        boolean flag = ucenterShuoshuoService.updateById(ucenterShuoshuo);
+        System.out.println("更改结果"+flag);
+        if(flag){
+            return R.ok();
+        }else {
+            return R.error();
+        }
+    }
 
 }
 
