@@ -50,10 +50,8 @@ public class UcenterShuoshuoController {
         //调用方法实现条件查询分页
         ucenterShuoshuoService.page(pageshuoshuo, wrapper);
         long total = pageshuoshuo.getTotal();
-        System.out.println(pageshuoshuo.getRecords().get(0).getShuoshuo());
         List<UcenterShuoshuo> records = pageshuoshuo.getRecords();
         Map<String, Object> map = new HashMap<>();
-
         map.put("items", records);
         map.put("current", pageshuoshuo.getCurrent());
         map.put("pages", pageshuoshuo.getPages());
