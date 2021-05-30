@@ -101,5 +101,13 @@ public class UcenterShuoshuoController {
         }
     }
 
+    //根据用户id查询用户说说
+    @GetMapping("getShuoshuoById/{id}")
+    public R getShuoshuoById(@PathVariable String id){
+     List<UcenterShuoshuo> list= ucenterShuoshuoService.getShuoshuoById(id);
+     return R.ok().data("list",list);
+    }
+
+
 }
 

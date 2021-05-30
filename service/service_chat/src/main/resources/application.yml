@@ -17,4 +17,4 @@ spring:
       discovery:
         server-addr: 39.101.196.37:8848
     redis:
-    host: 39.101.196.37
+      host: 39.101.196.37

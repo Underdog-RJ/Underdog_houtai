@@ -62,6 +62,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
                 //如果发送消息好友在线，可以直接将消息发送给好友
                 Channel channel=UserChannelMap.get(chatRecord.getFriendId());
                 if(!StringUtils.isEmpty(channel)){
+
                     channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(message)));
                 }else {
                     //如果不在线，暂时不发送

@@ -37,7 +37,6 @@ public class ChatRecordController {
      */
     @GetMapping("getRecordByUserId/{userId}")
     public R getRecordByUserId(@PathVariable String userId){
-
         List<UnReadMessage> list=chatRecordService.getRecordByUserId(userId);
         return R.ok().data("list",list);
     }

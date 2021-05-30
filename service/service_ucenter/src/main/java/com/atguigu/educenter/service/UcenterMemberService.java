@@ -3,6 +3,7 @@ package com.atguigu.educenter.service;
 import com.atguigu.commonutils.R;
 import com.atguigu.educenter.entity.UcenterMember;
 import com.atguigu.educenter.entity.UcenterVo;
+import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 import com.atguigu.educenter.vo.UcentmentberVo;
 import com.atguigu.eduservice.entity.UnReadMessage;
@@ -41,7 +42,10 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     List<UcenterMember> ucenterMemberService(String memberId);
 
 
-    boolean setMail(String userId, String mail);
+    UcenterMember setMail(String userId, String mail);
 
     List<UcenterVo> getUserInfoByIds(List<UnReadMessage> list);
+
+    CountInfo getUserCountInfo(String userId);
+
 }

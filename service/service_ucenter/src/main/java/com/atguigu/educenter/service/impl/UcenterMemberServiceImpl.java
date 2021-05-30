@@ -3,15 +3,12 @@ package com.atguigu.educenter.service.impl;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.MD5;
 import com.atguigu.commonutils.R;
-import com.atguigu.educenter.entity.TbFriend;
-import com.atguigu.educenter.entity.TbFriendReq;
-import com.atguigu.educenter.entity.UcenterMember;
-import com.atguigu.educenter.entity.UcenterVo;
+import com.atguigu.educenter.client.EnjoyBlogClient;
+import com.atguigu.educenter.entity.*;
 import com.atguigu.educenter.mapper.UcenterMemberMapper;
-import com.atguigu.educenter.service.TbFriendReqService;
-import com.atguigu.educenter.service.TbFriendService;
-import com.atguigu.educenter.service.UcenterMemberService;
+import com.atguigu.educenter.service.*;
 import com.atguigu.educenter.utils.MailUtils;
+import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 
 import com.atguigu.educenter.vo.UcentmentberVo;
@@ -49,6 +46,15 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
     @Autowired
     private TbFriendReqService tbFriendReqService;
+
+    @Autowired
+    private UcenterKechengService ucenterKechengService;
+
+    @Autowired
+    private UcenterShuoshuoService ucenterShuoshuoService;
+
+    @Autowired
+    private EnjoyBlogClient enjoyBlogClient;
 
     @Override
     public String login(UcenterMember ucenterMember) {
@@ -269,19 +275,20 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         return memberList;
     }
 
-
-
-
     @Override
-    public boolean setMail(String userId, String mail) {
-        boolean flag = MailUtils.sendMail(mail, "儿子", "我是你爸爸");
+    public UcenterMember setMail(String userId, String mail) {
+        boolean flag = MailUtils.sendMail(mail, "UnderdogEdu", "此邮件为绑定邮箱无需回复。。。");
         if(flag==true){
             UcenterMember ucenterMember = baseMapper.selectById(userId);
             ucenterMember.setMail(mail);
             ucenterMember.setMailType(0);
+
             baseMapper.updateById(ucenterMember);
+            return ucenterMember;
+        }else {
+            return null;
         }
-        return flag;
+
     }
 
     @Override
@@ -297,5 +304,25 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         }
 
         return listResul;
+    }
+
+    @Override
+    public CountInfo getUserCountInfo(String userId) {
+
+        QueryWrapper<UcenterShuoshuo> wrapperShuoshuo=new QueryWrapper<>();
+        wrapperShuoshuo.eq("acl_user_id",userId);
+        int countShuoshuo = ucenterShuoshuoService.count(wrapperShuoshuo);
+
+        QueryWrapper<UcenterKecheng> wrapperKecheng=new QueryWrapper<>();
+        wrapperKecheng.eq("user_id",userId);
+        wrapperKecheng.eq("is_collect",1);
+        int countKecheng = ucenterKechengService.count(wrapperKecheng);
+
+        Integer countBlog = enjoyBlogClient.EnjoyBlogCountById(userId);
+        CountInfo countInfo=new CountInfo();
+        countInfo.setBlog(countBlog);
+        countInfo.setKecheng(countKecheng);
+        countInfo.setShuoshuo(countShuoshuo);
+        return countInfo;
     }
 }

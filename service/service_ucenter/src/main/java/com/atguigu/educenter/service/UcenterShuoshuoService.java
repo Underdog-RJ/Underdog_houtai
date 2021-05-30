@@ -3,6 +3,8 @@ package com.atguigu.educenter.service;
 import com.atguigu.educenter.entity.UcenterShuoshuo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -13,4 +15,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface UcenterShuoshuoService extends IService<UcenterShuoshuo> {
 
+    List<UcenterShuoshuo> getShuoshuoById(String id);
 }

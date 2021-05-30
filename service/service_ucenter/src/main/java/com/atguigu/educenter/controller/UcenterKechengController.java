@@ -76,6 +76,7 @@ public class UcenterKechengController{
         }
         return R.ok().success(update);
     }
+
     //根据用户ID获得所有收藏
     @GetMapping("get_collect/{current}/{limit}")
     public R getCollectById(@PathVariable Long current,@PathVariable Long limit,HttpServletRequest request){
@@ -84,6 +85,7 @@ public class UcenterKechengController{
         QueryWrapper<UcenterKecheng> wrapper = new QueryWrapper<>();
         Page<EduCourse> page=new Page<>(current,limit);
         wrapper.eq("user_id",userId);
+        wrapper.eq("is_collect",1);
         wrapper.orderByDesc("gmt_create");
         ucenterKechengService.pageList( page, userId);
         List<EduCourse> records = page.getRecords();
@@ -121,5 +123,49 @@ public class UcenterKechengController{
         map.put("hasPrevious", page.hasPrevious());
         return R.ok().data(map);
     }
+
+
+    //根据用户ID获得所有收藏
+    @GetMapping("findCollectById/{userId}/{current}/{limit}")
+    public R findCollectById(@PathVariable String userId,@PathVariable Long current,@PathVariable Long limit,HttpServletRequest request){
+        QueryWrapper<UcenterKecheng> wrapper = new QueryWrapper<>();
+        Page<EduCourse> page=new Page<>(current,limit);
+        wrapper.eq("user_id",userId);
+        wrapper.eq("is_collect",1);
+        wrapper.orderByDesc("gmt_create");
+        ucenterKechengService.pageList( page, userId);
+        List<EduCourse> records = page.getRecords();
+        Map<String, Object> map = new HashMap<>();
+        map.put("items", records);
+        map.put("current", page.getCurrent());
+        map.put("pages", page.getPages());
+        map.put("size", page.getSize());
+        map.put("total", page.getTotal());
+        map.put("hasNext", page.hasNext());
+        map.put("hasPrevious", page.hasPrevious());
+        return R.ok().data(map);
+    }
+
+    @GetMapping("findPayById/{userId}/{current}/{limit}")
+    public R findPayById(@PathVariable String userId,@PathVariable Long current,@PathVariable Long limit){
+        QueryWrapper<UcenterKecheng> wrapper = new QueryWrapper<>();
+        Page<EduCourse> page=new Page<>(current,limit);
+        wrapper.eq("user_id",userId);
+        wrapper.orderByDesc("gmt_create");
+        ucenterKechengService.pagePayList( page, userId);
+        List<EduCourse> records = page.getRecords();
+        Map<String, Object> map = new HashMap<>();
+        map.put("items", records);
+        map.put("current", page.getCurrent());
+        map.put("pages", page.getPages());
+        map.put("size", page.getSize());
+        map.put("total", page.getTotal());
+        map.put("hasNext", page.hasNext());
+        map.put("hasPrevious", page.hasPrevious());
+        return R.ok().data(map);
+    }
+
+
+
 }
 

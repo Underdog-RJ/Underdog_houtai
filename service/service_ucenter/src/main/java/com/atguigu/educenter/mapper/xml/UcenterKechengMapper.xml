@@ -9,6 +9,10 @@ FROM
 	on co.id=uck.course_id
 	<where>
 		uck.user_id=${userId}
+		and
+		co.id is not null
+		and
+		uck.is_collect = '1'
 	</where>
 
     </select>

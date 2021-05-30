@@ -4,6 +4,7 @@ package com.atguigu.educenter.controller;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.commonutils.order.UcenterMemberOrder;
+import com.atguigu.educenter.entity.OtherMember;
 import com.atguigu.educenter.entity.UcenterMember;
 import com.atguigu.educenter.entity.UcenterMemberZhuye;
 import com.atguigu.educenter.entity.UcenterVo;
@@ -11,6 +12,7 @@ import com.atguigu.educenter.service.UcenterMemberService;
 import com.atguigu.educenter.service.UcenterMemberZhuyeService;
 import com.atguigu.educenter.utils.ConstantWxUtils;
 import com.atguigu.educenter.utils.HttpClientUtils;
+import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 import com.atguigu.educenter.vo.UcentmentberVo;
 import com.atguigu.eduservice.entity.UnReadMessage;
@@ -144,6 +146,20 @@ public class UcenterMemberController {
         return ucenterMember;
     }
 
+
+    //根据id获取用户信息
+    @GetMapping("getUserInfoById/{memberId}")
+    public R getUserInfoById(@PathVariable String memberId)
+    {
+        //根据用户id获取用户信息
+        UcenterMember ucenterMember = ucenterMemberService.getById(memberId);
+        OtherMember member=new OtherMember();
+        BeanUtils.copyProperties(ucenterMember,member);
+        return R.ok().data("member",member);
+    }
+
+
+
     //根据用户id获取用户信息
     @PostMapping("getUserInfoOrder/{id}")
     public UcenterMemberOrder getUserInfoOrder(@PathVariable String id){
@@ -238,12 +254,19 @@ public class UcenterMemberController {
         return R.ok().data("ucenterMemberZhuye",ucenterMemberZhuye);
     }
 
+    //根据用户id获取用户主页
+    @GetMapping("getOwnPageById/{memberId}")
+    public R getOwnPageById(@PathVariable String memberId){
+        UcenterMemberZhuye ucenterMemberZhuye=ucenterMemberZhuyeService.getOwnPage(memberId);
+        return R.ok().data("ucenterMemberZhuye",ucenterMemberZhuye);
+    }
+
 
     @GetMapping("setOwnMail/{mail}")
     public R setMail(@PathVariable String mail ,HttpServletRequest request){
         String userId = JwtUtils.getMemberIdByJwtToken(request);
-        boolean flag=ucenterMemberService.setMail(userId,mail);
-        return R.ok();
+        UcenterMember ucenterMember=ucenterMemberService.setMail(userId,mail);
+        return R.ok().data("ucenterMember",ucenterMember);
     }
 
 
@@ -257,6 +280,25 @@ public class UcenterMemberController {
         return R.ok().data("list",result);
     }
 
+
+    /**
+     * 获取用户的收藏数，说说数
+     */
+    @GetMapping("getUserCountInfo")
+    public R getUserCountInfo(HttpServletRequest request){
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        CountInfo info=ucenterMemberService.getUserCountInfo(userId);
+        return R.ok().data("countInfo",info);
+    }
+
+    /**
+     * 根据id获取用户的收藏数，说说数
+     */
+    @GetMapping("getUserCountInfoById/{memberId}")
+    public R getUserCountInfo(@PathVariable String memberId){
+        CountInfo info=ucenterMemberService.getUserCountInfo(memberId);
+        return R.ok().data("countInfo",info);
+    }
 
 }
 

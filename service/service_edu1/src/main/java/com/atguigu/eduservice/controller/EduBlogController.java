@@ -78,6 +78,7 @@ public class EduBlogController {
         eduBlogService.save(eduBlog);
         return R.ok();
     }
+
     @PostMapping("getBlogByUserId")
     public R getBlogByUserId(HttpServletRequest request){
         String token = request.getHeader("token");
@@ -88,6 +89,13 @@ public class EduBlogController {
             return R.ok().data("list",list);
         }
        return R.ok();
+    }
+
+    //根据用户Id获取blog列表
+    @PostMapping("findBlogByUserId/{userId}")
+    public R findBlogByUserId(@PathVariable String userId){
+            List<EduBlog> list=eduBlogService.getBlogByUserId(userId);
+            return R.ok().data("list",list);
     }
 
     //修改博客
