@@ -3,6 +3,7 @@ package com.atguigu.educenter.controller;
 
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
+import com.atguigu.educenter.entity.ResetPasswordVo;
 import com.atguigu.educenter.entity.UcenterShuoshuo;
 import com.atguigu.educenter.service.UcenterShuoshuoService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -107,6 +108,7 @@ public class UcenterShuoshuoController {
      List<UcenterShuoshuo> list= ucenterShuoshuoService.getShuoshuoById(id);
      return R.ok().data("list",list);
     }
+
 
 
 }

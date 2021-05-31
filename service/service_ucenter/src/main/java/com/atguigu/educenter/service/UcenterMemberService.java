@@ -1,6 +1,7 @@
 package com.atguigu.educenter.service;
 
 import com.atguigu.commonutils.R;
+import com.atguigu.educenter.entity.ResetPasswordVo;
 import com.atguigu.educenter.entity.UcenterMember;
 import com.atguigu.educenter.entity.UcenterVo;
 import com.atguigu.educenter.vo.CountInfo;
@@ -51,4 +52,8 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     R setMobile(String mobile, String code,String userId);
 
     R valideOwnMail(String memeberId, String mail, String code);
+
+    UcenterMember updateUserPassword(String userId, String password);
+
+    R resetPassword(ResetPasswordVo resetPasswordVo);
 }

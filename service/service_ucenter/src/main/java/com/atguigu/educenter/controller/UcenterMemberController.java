@@ -4,10 +4,7 @@ package com.atguigu.educenter.controller;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.commonutils.order.UcenterMemberOrder;
-import com.atguigu.educenter.entity.OtherMember;
-import com.atguigu.educenter.entity.UcenterMember;
-import com.atguigu.educenter.entity.UcenterMemberZhuye;
-import com.atguigu.educenter.entity.UcenterVo;
+import com.atguigu.educenter.entity.*;
 import com.atguigu.educenter.service.UcenterMemberService;
 import com.atguigu.educenter.service.UcenterMemberZhuyeService;
 import com.atguigu.educenter.utils.ConstantWxUtils;
@@ -310,5 +307,22 @@ public class UcenterMemberController {
         return R.ok().data("countInfo",info);
     }
 
+    /**
+     * 根据用户id修改密码
+     */
+    @GetMapping("updateUserPassword/{password}")
+    public R updateUserPassword(@PathVariable String password, HttpServletRequest request){
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        UcenterMember  ucenterMember=ucenterMemberService.updateUserPassword(userId,password);
+        return R.ok().data("ucenterMember",ucenterMember);
+    }
+
+
+    //根据邮箱重置密码
+    @PostMapping("resetPassword")
+    public R resetPassword(@RequestBody ResetPasswordVo resetPasswordVo){
+
+        return  ucenterMemberService.resetPassword(resetPasswordVo);
+    }
 }
 

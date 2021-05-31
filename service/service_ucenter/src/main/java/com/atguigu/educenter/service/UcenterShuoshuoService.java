@@ -1,5 +1,7 @@
 package com.atguigu.educenter.service;
 
+import com.atguigu.commonutils.R;
+import com.atguigu.educenter.entity.ResetPasswordVo;
 import com.atguigu.educenter.entity.UcenterShuoshuo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -16,4 +18,7 @@ import java.util.List;
 public interface UcenterShuoshuoService extends IService<UcenterShuoshuo> {
 
     List<UcenterShuoshuo> getShuoshuoById(String id);
+
+
+
 }

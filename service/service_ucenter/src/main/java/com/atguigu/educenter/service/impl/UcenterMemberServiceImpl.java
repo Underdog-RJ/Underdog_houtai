@@ -373,4 +373,39 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         return R.ok().message("绑定成功");
 
     }
+
+    @Override
+    public UcenterMember updateUserPassword(String userId, String password) {
+        UcenterMember ucenterMember = baseMapper.selectById(userId);
+        if(ucenterMember!=null){
+            ucenterMember.setPassword(MD5.encrypt(password));
+            baseMapper.updateById(ucenterMember);
+            return ucenterMember;
+        }else {
+            throw new GuliException();
+        }
+    }
+
+
+    @Override
+    public R resetPassword(ResetPasswordVo resetPasswordVo) {
+        QueryWrapper<UcenterMember> wrapper=new QueryWrapper<>();
+        if(!StringUtils.isEmpty(resetPasswordVo.getMail())){
+            wrapper.eq("mail",resetPasswordVo.getMail());
+        }
+        UcenterMember ucenterMember = baseMapper.selectOne(wrapper);
+        if(ucenterMember==null){
+            return R.error().message("该用户为空");
+        }
+        String redisCode = redisTemplate.opsForValue().get(resetPasswordVo.getMail());
+
+        if(redisCode.equals(resetPasswordVo.getCode())){
+            ucenterMember.setPassword(MD5.encrypt(resetPasswordVo.getPassword()));
+            baseMapper.updateById(ucenterMember);
+            return R.ok().message("小lg,哥哥已经为你重置密码");
+        }else {
+            return R.error().message("小lg,验证码不对");
+        }
+
+    }
 }
