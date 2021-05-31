@@ -8,6 +8,7 @@ import com.atguigu.educenter.entity.*;
 import com.atguigu.educenter.mapper.UcenterMemberMapper;
 import com.atguigu.educenter.service.*;
 import com.atguigu.educenter.utils.MailUtils;
+import com.atguigu.educenter.utils.RandomUtil;
 import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 
@@ -25,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -55,6 +57,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
     @Autowired
     private EnjoyBlogClient enjoyBlogClient;
+
 
     @Override
     public String login(UcenterMember ucenterMember) {
@@ -112,7 +115,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         //判断验证码
         //获取验证码
         String redisCode = redisTemplate.opsForValue().get(mobile);
-        if(!redisCode.equals(redisCode)){
+        if(!redisCode.equals(code)){
             throw new GuliException(20001,"注册失败");
         }
 
@@ -276,19 +279,23 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     }
 
     @Override
-    public UcenterMember setMail(String userId, String mail) {
-        boolean flag = MailUtils.sendMail(mail, "UnderdogEdu", "此邮件为绑定邮箱无需回复。。。");
-        if(flag==true){
-            UcenterMember ucenterMember = baseMapper.selectById(userId);
-            ucenterMember.setMail(mail);
-            ucenterMember.setMailType(0);
+    public R setMail(String mail) {
 
-            baseMapper.updateById(ucenterMember);
-            return ucenterMember;
-        }else {
-            return null;
+        String code = redisTemplate.opsForValue().get(mail);
+        if(!StringUtils.isEmpty(code)){
+            return R.error().message("以为您的邮箱发送验证码，请勿重复发送");
         }
 
+
+        code = RandomUtil.getFourBitRandom();
+
+        boolean flag = MailUtils.sendMail(mail, "此邮件为UnderdogEdu验证邮箱，您的验证码为："+code, "UnderdogEdu邮箱验证");
+        if(flag){
+            redisTemplate.opsForValue().set(mail,code,5, TimeUnit.MINUTES);
+            return R.ok().message("发送成功,5分钟内有效");
+        }else {
+            return R.error().message("发送失败");
+        }
     }
 
     @Override
@@ -324,5 +331,46 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         countInfo.setKecheng(countKecheng);
         countInfo.setShuoshuo(countShuoshuo);
         return countInfo;
+    }
+
+    @Override
+    public R setMobile(String mobile, String code,String userId) {
+        //判断验证码
+        //获取验证码
+        String redisCode = redisTemplate.opsForValue().get(mobile);
+        if(!redisCode.equals(code)){
+            return R.error().message("验证码错误");
+        }
+        //判断手机号是否重复
+        QueryWrapper<UcenterMember> wrapper=new QueryWrapper<>();
+        wrapper.eq("mobile",mobile);
+        Integer count = baseMapper.selectCount(wrapper);
+        if(count>0){
+            return R.error().message("手机号重复");
+        }
+        UcenterMember ucenterMember = baseMapper.selectById(userId);
+        ucenterMember.setMobile(mobile);
+        baseMapper.updateById(ucenterMember);
+        return R.ok().message("绑定成功");
+    }
+
+    @Override
+    public R valideOwnMail(String memeberId, String mail, String code) {
+        String redisCode = redisTemplate.opsForValue().get(mail);
+        if(!redisCode.equals(code)){
+            return R.error().message("验证码错误");
+        }
+        //判断手机号是否重复
+        QueryWrapper<UcenterMember> wrapper=new QueryWrapper<>();
+        wrapper.eq("mail",mail);
+        Integer count = baseMapper.selectCount(wrapper);
+        if(count>0){
+            return R.error().message("邮箱重复");
+        }
+        UcenterMember ucenterMember = baseMapper.selectById(memeberId);
+        ucenterMember.setMail(mail);
+        baseMapper.updateById(ucenterMember);
+        return R.ok().message("绑定成功");
+
     }
 }

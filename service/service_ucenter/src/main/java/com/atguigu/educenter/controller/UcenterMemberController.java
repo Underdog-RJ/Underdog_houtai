@@ -130,6 +130,12 @@ public class UcenterMemberController {
         return R.ok();
     }
 
+    @GetMapping("setMobile/{mobile}/{code}")
+    public R setMobile(@PathVariable String mobile,@PathVariable String code,HttpServletRequest request){
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        return ucenterMemberService.setMobile(mobile,code,userId);
+    }
+
     @GetMapping("getMemberInfo")
     public R getMemberInfo(HttpServletRequest request){
         String memberId = JwtUtils.getMemberIdByJwtToken(request);
@@ -263,12 +269,16 @@ public class UcenterMemberController {
 
 
     @GetMapping("setOwnMail/{mail}")
-    public R setMail(@PathVariable String mail ,HttpServletRequest request){
-        String userId = JwtUtils.getMemberIdByJwtToken(request);
-        UcenterMember ucenterMember=ucenterMemberService.setMail(userId,mail);
-        return R.ok().data("ucenterMember",ucenterMember);
+    public R setMail(@PathVariable String mail){
+        return  ucenterMemberService.setMail(mail);
     }
 
+    @GetMapping("valideOwnMail/{mail}/{code}")
+    public R valideOwnMail(@PathVariable String mail,@PathVariable String code,HttpServletRequest request){
+        String memeberId = JwtUtils.getMemberIdByJwtToken(request);
+
+        return  ucenterMemberService.valideOwnMail(memeberId,mail,code);
+    }
 
     /**
      * 根据批量用户ids查询用户信息

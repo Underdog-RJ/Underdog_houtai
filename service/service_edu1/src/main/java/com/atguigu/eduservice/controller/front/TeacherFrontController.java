@@ -35,7 +35,7 @@ public class TeacherFrontController {
         return R.ok().data(map);
     }
 
-    //讲师想起个的功能
+    //讲师详情
     @GetMapping("getTeacherFrontInfo/{teacherId}")
     public R getTeacherFrontInfo(@PathVariable String teacherId) {
         //1.根据讲师id查询讲师基本信息

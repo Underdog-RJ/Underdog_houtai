@@ -42,10 +42,13 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     List<UcenterMember> ucenterMemberService(String memberId);
 
 
-    UcenterMember setMail(String userId, String mail);
+    R setMail(String mail);
 
     List<UcenterVo> getUserInfoByIds(List<UnReadMessage> list);
 
     CountInfo getUserCountInfo(String userId);
 
+    R setMobile(String mobile, String code,String userId);
+
+    R valideOwnMail(String memeberId, String mail, String code);
 }
