@@ -21,21 +21,13 @@
             <artifactId>fastjson</artifactId>
 
         </dependency>
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>aliyun-java-sdk-live</artifactId>
 
-        </dependency>
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-vod</artifactId>
 
         </dependency>
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>aliyun-sdk-vod-upload</artifactId>
-            <version>1.4.12</version>
-        </dependency>
+
         <dependency>
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
@@ -44,7 +36,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>4.0.12</version>
+            <version>4.5.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

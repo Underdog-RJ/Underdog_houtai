@@ -50,7 +50,7 @@ public class CodeGenerator {
         PackageConfig pc = new PackageConfig();
         pc.setModuleName("educms"); //模块名
         pc.setParent("com.atguigu");
-        pc.setController("controller");
+        pc.setController("com.atguigu.controller");
         pc.setEntity("entity");
         pc.setService("service");
         pc.setMapper("mapper");

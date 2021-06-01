@@ -26,7 +26,7 @@ public class CodeGenerator {
         // 2、全局配置
         GlobalConfig gc = new GlobalConfig();
         String projectPath = System.getProperty("user.dir");
-        gc.setOutputDir("F:\\underdog_houtai\\service\\service_edu1" + "/src/main/java");
+        gc.setOutputDir("D:\\projects\\underdog_houtai\\service\\service-live" + "/src/main/java");
         gc.setAuthor("Zhang zhengxu");
         gc.setOpen(false); //生成后是否打开资源管理器
         gc.setFileOverride(false); //重新生成时文件是否覆盖
@@ -48,9 +48,9 @@ public class CodeGenerator {
 
         // 4、包配置
         PackageConfig pc = new PackageConfig();
-        pc.setModuleName("eduservice"); //模块名
+
         pc.setParent("com.atguigu");
-        pc.setController("controller");
+        pc.setController("com.atguigu.controller");
         pc.setEntity("entity");
         pc.setService("service");
         pc.setMapper("mapper");
@@ -58,7 +58,7 @@ public class CodeGenerator {
 
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude("blog_enjoy");
+        strategy.setInclude("edu_living");
         strategy.setNaming(NamingStrategy.underline_to_camel);//数据库表映射到实体的命名策略
         strategy.setTablePrefix(pc.getModuleName() + "_"); //生成实体时去掉表前缀
 

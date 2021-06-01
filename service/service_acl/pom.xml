@@ -44,7 +44,7 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-com.atguigu.config</artifactId>
         </dependency>
     </dependencies>
 </project>

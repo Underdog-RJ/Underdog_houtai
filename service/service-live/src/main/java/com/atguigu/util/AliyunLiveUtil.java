@@ -1,8 +1,8 @@
-package util;
+package com.atguigu.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import config.AliyunLiveConfig;
+import com.atguigu.config.AliyunLiveConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

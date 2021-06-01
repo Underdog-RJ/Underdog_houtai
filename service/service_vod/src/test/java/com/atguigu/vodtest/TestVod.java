@@ -10,7 +10,7 @@ import com.aliyuncs.vod.model.v20170321.GetPlayInfoResponse;
 import com.aliyuncs.vod.model.v20170321.GetVideoPlayAuthRequest;
 import com.aliyuncs.vod.model.v20170321.GetVideoPlayAuthResponse;
 
-import java.util.List;
+import java.com.atguigu.util.List;
 
 public class TestVod {
 
