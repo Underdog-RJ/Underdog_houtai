@@ -56,4 +56,6 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     UcenterMember updateUserPassword(String userId, String password);
 
     R resetPassword(ResetPasswordVo resetPasswordVo);
+
+    UcenterMember loginUser(String code);
 }

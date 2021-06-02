@@ -1,12 +1,15 @@
 package com.atguigu.educenter.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.MD5;
 import com.atguigu.commonutils.R;
 import com.atguigu.educenter.client.EnjoyBlogClient;
+import com.atguigu.educenter.config.ConstantPropertiesUtil;
 import com.atguigu.educenter.entity.*;
 import com.atguigu.educenter.mapper.UcenterMemberMapper;
 import com.atguigu.educenter.service.*;
+import com.atguigu.educenter.utils.HttpClientUtils;
 import com.atguigu.educenter.utils.MailUtils;
 import com.atguigu.educenter.utils.RandomUtil;
 import com.atguigu.educenter.vo.CountInfo;
@@ -406,6 +409,27 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         }else {
             return R.error().message("小lg,验证码不对");
         }
+    }
 
+    @Override
+    public UcenterMember loginUser(String code) {
+        String baseURL = "http://open.51094.com/user/auth.html";
+        String params = "type=get_user_info&code="+code+"&appid="+ ConstantPropertiesUtil.OAUTH_APPID+"&token="+ConstantPropertiesUtil.OAUTH_TOKEN;
+        String result = HttpRequest.sendPost(baseURL, params);
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        String openid = jsonObject.getString("uniq");
+        UcenterMember member = getOpenIdMember(openid);
+        if(member==null){
+            String nickname = jsonObject.getString("name");
+            String avatar = jsonObject.getString("img");
+            Integer sex = jsonObject.getInteger("sex");
+            member=new UcenterMember();
+            member.setOpenid(openid);
+            member.setNickname(nickname);
+            member.setAvatar(avatar);
+            member.setSex(sex);
+            baseMapper.insert(member);
+        }
+        return member;
     }
 }

@@ -25,6 +25,7 @@ public class AliyunLiveController {
 
         String teacherId = JwtUtils.getMemberIdByJwtToken(request);
 
+
         return eduLivingService.addLive(teacherId,eduLiving);
 
 
@@ -40,6 +41,9 @@ public class AliyunLiveController {
 //        Map<String, String> pullUrl = AliyunLiveUtil.createPullUrl(courseId,  aliyunLiveConfig);
 //
 //        return R.ok().data("pullUrl",pullUrl);
+
+        System.out.println(eduLivingService);
+        eduLivingService.getLive();
         return null;
     }
 
