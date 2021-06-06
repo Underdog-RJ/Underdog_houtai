@@ -1,4 +1,4 @@
-package com.atguigu;
+package com.atguigu.livingservice;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-@MapperScan("com.atguigu")
+@MapperScan("com.atguigu.livingservice.mapper")
 @ComponentScan("com.atguigu")
 public class LivingApplication {
     public static void main(String[] args) {

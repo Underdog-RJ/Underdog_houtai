@@ -1,8 +1,8 @@
-package com.atguigu.util;
+package com.atguigu.livingservice.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import com.atguigu.config.AliyunLiveConfig;
+import com.atguigu.livingservice.config.AliyunLiveConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,7 @@ public class AliyunLiveUtil {
      * @param aliyunLiveConfig
      * @return
      */
-    public static String createPushUrl(Integer sourceId, AliyunLiveConfig aliyunLiveConfig) {
+    public static String createPushUrl(String sourceId, AliyunLiveConfig aliyunLiveConfig) {
 
         // 推流域名
         String pushDomain = aliyunLiveConfig.getAliyunLivePushDomain();
@@ -74,7 +74,7 @@ public class AliyunLiveUtil {
      * @param aliyunLiveConfig
      * @return
      */
-    public static Map<String, String> createPullUrl(Integer sourceId,  AliyunLiveConfig aliyunLiveConfig) {
+    public static Map<String, String> createPullUrl(String sourceId,  AliyunLiveConfig aliyunLiveConfig) {
 
         // 拉流域名
         String pullDomain = aliyunLiveConfig.getAliyunLivePullDomain();

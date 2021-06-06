@@ -50,7 +50,7 @@ public class CodeGenerator {
         PackageConfig pc = new PackageConfig();
 
         pc.setParent("com.atguigu");
-        pc.setController("com.atguigu.controller");
+        pc.setController("com.atguigu.livingservice.controller");
         pc.setEntity("entity");
         pc.setService("service");
         pc.setMapper("mapper");

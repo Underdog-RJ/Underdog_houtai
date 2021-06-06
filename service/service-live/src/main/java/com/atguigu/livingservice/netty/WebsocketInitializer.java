@@ -1,4 +1,4 @@
-package com.atguigu.eduservice.netty;
+package com.atguigu.livingservice.netty;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -7,7 +7,6 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import io.netty.handler.timeout.IdleStateHandler;
 
 public class WebsocketInitializer extends ChannelInitializer<SocketChannel> {
     @Override
@@ -33,11 +32,11 @@ public class WebsocketInitializer extends ChannelInitializer<SocketChannel> {
         // websocket服务器处理的协议，用于指定给客户端连接访问的路由: /ws
         // 本handler会帮你处理一些握手动作: handshaking(close, ping, pong) ping + pong = 心跳
         // 对于websocket来讲，都是以frames进行传输的，不同的数据类型对应的frames也不同
-        pipeline.addLast(new WebSocketServerProtocolHandler("/ws"));
+        pipeline.addLast(new WebSocketServerProtocolHandler("/living"));
 
 
         // 添加自定义的handler
-        pipeline.addLast(new ChatHandler());
+        pipeline.addLast(new LivingHandler());
 
 
     }
