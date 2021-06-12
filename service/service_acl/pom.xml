@@ -12,6 +12,11 @@
     <artifactId>service_acl</artifactId>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.atguigu</groupId>
             <artifactId>spring_security</artifactId>

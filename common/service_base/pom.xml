@@ -7,6 +7,7 @@
         <groupId>com.atguigu</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>service_base</artifactId>
@@ -18,6 +19,27 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**.*</include>
+                    <include>**/*.*</include><!-- i18n能读取到 -->
+                    <include>**/*/*.*</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
 
 
 </project>

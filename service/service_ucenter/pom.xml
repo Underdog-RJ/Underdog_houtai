@@ -11,6 +11,11 @@
 
     <artifactId>service_ucenter</artifactId>
 <dependencies>
+
+    <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    </dependency>
     <!--httpclient-->
     <dependency>
         <groupId>org.apache.httpcomponents</groupId>

@@ -1,20 +1,20 @@
-server:
-  port: 8011
-spring:
-  application:
-    name: service-chat
-  data:
-    mongodb:
-      host: 39.101.196.37
-      database: chat_record
-  datasource:
-    password: Zhangzhengxu123.
-    username: root
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://39.101.196.37/guli?serverTimezone=GMT%2B8
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 39.101.196.37:8848
-    redis:
-      host: 39.101.196.37
+#server:
+#  port: 8011
+#spring:
+#  application:
+#    name: service-chat
+#  data:
+#    mongodb:
+#      host: 39.101.196.37
+#      database: chat_record
+#  datasource:
+#    password: Zhangzhengxu123.
+#    username: root
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://39.101.196.37/guli?serverTimezone=GMT%2B8
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 39.101.196.37:8848
+#    redis:
+#      host: 39.101.196.37

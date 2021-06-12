@@ -11,6 +11,11 @@
 
     <artifactId>service_edu1</artifactId>
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/com.alibaba/easyexcel -->
         <dependency>
             <groupId>com.alibaba</groupId>

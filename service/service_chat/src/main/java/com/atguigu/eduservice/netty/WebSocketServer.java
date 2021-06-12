@@ -19,7 +19,7 @@ public class WebSocketServer {
 
     @PostConstruct
     public void start() throws InterruptedException {
-        future = server.bind(11001).sync();
+        future = server.bind(11010).sync();
         System.out.println("netty server - 启动成功");
     }
 

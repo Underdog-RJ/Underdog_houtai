@@ -11,6 +11,11 @@
 
     <artifactId>service_oss</artifactId>
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <!-- 阿里云oss依赖 -->
         <dependency>
             <groupId>com.aliyun.oss</groupId>
