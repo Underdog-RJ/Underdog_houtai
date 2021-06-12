@@ -11,12 +11,18 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.concurrent.EventExecutorGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+@Component
+@RabbitListener(queues = "living.delay.living.queue")
 public class LivingHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     //  用来保留所有的客户端连接
@@ -24,6 +30,14 @@ public class LivingHandler extends SimpleChannelInboundHandler<TextWebSocketFram
 
     //
     private static Map<String,List<Channel>> map=new HashMap<>();
+
+    @RabbitHandler
+    public void removeLiving(String msg){
+        if(map.containsKey(msg)){
+            map.remove(msg);
+            System.out.println("清除直播:"+msg);
+        }
+    }
 
 
     @Override

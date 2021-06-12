@@ -5,6 +5,7 @@ import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public interface EduBlogService extends IService<EduBlog> {
 
-    IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery);
+    IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery, HttpServletRequest request);
 
     Map<String, Object> findBypageFront(long page, long limit, BlogQuery blogQuery);
 

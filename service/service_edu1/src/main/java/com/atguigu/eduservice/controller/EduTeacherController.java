@@ -1,7 +1,9 @@
 package com.atguigu.eduservice.controller;
 
 
+import com.atguigu.eduservice.client.AclUserClient;
 import com.atguigu.eduservice.entity.EduTeacher;
+import com.atguigu.eduservice.entity.User;
 import com.atguigu.eduservice.entity.vo.TeacherQuery;
 import com.atguigu.eduservice.service.EduTeacherService;
 
@@ -16,9 +18,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -37,6 +42,9 @@ public class EduTeacherController {
     //把service注入
     @Autowired
     private EduTeacherService teacherService;
+
+    @Autowired
+    private AclUserClient aclUserClient;
 
     //1 查询讲师表所有数据
     @GetMapping("findAll")
@@ -127,9 +135,14 @@ public class EduTeacherController {
 
     //添加讲师接口的方法
     @PostMapping("addTeacher")
-    public R addTeacher(@RequestBody EduTeacher eduTeacher){
+    public R addTeacher(@RequestBody EduTeacher eduTeacher, HttpServletRequest request){
         boolean save = teacherService.save(eduTeacher);
         if(save){
+            User user=new User();
+            BeanUtils.copyProperties(eduTeacher,user);
+            user.setUsername(eduTeacher.getName());
+
+            aclUserClient.save(user,request.getHeader("token"));
             return R.ok();
         }
         else {

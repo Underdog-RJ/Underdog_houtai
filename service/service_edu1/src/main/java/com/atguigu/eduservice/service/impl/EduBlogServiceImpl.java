@@ -1,5 +1,6 @@
 package com.atguigu.eduservice.service.impl;
 
+import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.atguigu.eduservice.mapper.EduBlogMapper;
@@ -13,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -33,7 +36,7 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
 
 
     @Override
-    public IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery) {
+    public IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery, HttpServletRequest request) {
         Page<EduBlog> blogPage=new Page<>(page,limit);
         QueryWrapper<EduBlog> wrapper =new QueryWrapper<>();
         String title = blogQuery.getTitle();
@@ -60,7 +63,14 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         //排序
         wrapper.orderByDesc("gmt_create");
 
+        Map<String, String> map = JwtUtils.getUserIdByJwtToken(request);
+        if(!Objects.equals(map.get("nickname"),"admin")){
+            wrapper.eq("author_id",map.get("id"));
+        }
+
         return eduBlogMapper.selectPage(blogPage,wrapper);
+
+
     }
 
 

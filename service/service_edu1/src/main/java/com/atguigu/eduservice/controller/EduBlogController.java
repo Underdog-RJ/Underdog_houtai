@@ -45,7 +45,9 @@ public class EduBlogController {
 
     @PostMapping("pageBlogCondition/{page}/{limit}")
     public R findAllBlog(@PathVariable Long page, @PathVariable Long limit, @RequestBody(required = false)BlogQuery blogQuery, HttpServletRequest request){
-        IPage<EduBlog> iPage=eduBlogService.findByPage(page,limit,blogQuery);
+
+
+        IPage<EduBlog> iPage=eduBlogService.findByPage(page,limit,blogQuery,request);
         return R.ok().data("list",iPage.getRecords()).data("total",iPage.getTotal());
     }
 

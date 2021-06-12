@@ -1,6 +1,7 @@
 package com.atguigu.eduservice.controller;
 
 
+import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.eduservice.entity.EduCourse;
 import com.atguigu.eduservice.entity.vo.CourseInfoVo;
 import com.atguigu.eduservice.entity.vo.CoursePublishVo;
@@ -15,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * <p>
@@ -34,7 +38,7 @@ public class EduCourseController {
 
     //课程列表，基本实现
     @PostMapping("pageCourseCondition/{current}/{limit}")
-    public R getCourseList(@PathVariable Long current, @PathVariable Long limit, @RequestBody(required = false)CourseQuery courseQuery){
+    public R getCourseList(@PathVariable Long current, @PathVariable Long limit, @RequestBody(required = false)CourseQuery courseQuery, HttpServletRequest request){
         Page<EduCourse> pageCourse=new Page<>(current,limit);
         QueryWrapper<EduCourse> wrapper=new QueryWrapper<>();
 
@@ -48,6 +52,10 @@ public class EduCourseController {
         }
         //排序
         wrapper.orderByDesc("gmt_create");
+        Map<String, String> map = JwtUtils.getUserIdByJwtToken(request);
+        if(!Objects.equals(map.get("nickname"),"admin")){
+            wrapper.eq("teacher_id",map.get("id"));
+        }
         //分页查询
         courseService.page(pageCourse, wrapper);
         List<EduCourse> list = pageCourse.getRecords();

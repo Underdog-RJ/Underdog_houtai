@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Transient;
 
 /**
  * <p>
@@ -34,6 +35,10 @@ public class EduTeacher implements Serializable {
 
     @ApiModelProperty(value = "讲师姓名")
     private String name;
+
+
+    @TableField(exist = false)
+    private String password;
 
     @ApiModelProperty(value = "讲师简介")
     private String intro;

@@ -9,6 +9,7 @@ import com.atguigu.livingservice.service.EduLivingService;
 import com.atguigu.livingservice.util.AliyunLiveUtil;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -39,13 +40,14 @@ public class EduLivingServiceImpl extends ServiceImpl<EduLivingMapper, EduLiving
     @Autowired
     private RedisTemplate<String,String> redisTemplate;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @Override
     public R addLive( Map<String, String> teacherInfo, EduLiving eduLiving) {
 
 
         String teacherId = teacherInfo.get("id");
-
-
 
         String eduLivingJson = redisTemplate.opsForValue().get(teacherId);
         if(!StringUtils.isEmpty(eduLivingJson)){
@@ -67,7 +69,8 @@ public class EduLivingServiceImpl extends ServiceImpl<EduLivingMapper, EduLiving
         baseMapper.insert(finalLiving);
         String finalLivingJson = JSONObject.toJSONString(finalLiving);
         redisTemplate.opsForValue().set(teacherId+"_living",finalLivingJson,Integer.parseInt(eduLiving.getTimeHours()), TimeUnit.HOURS);
-
+        String id = finalLiving.getId();
+        rabbitTemplate.convertAndSend("living-event-exchange","living.create.living",id);
         return R.ok().data("finalLiving",finalLiving).message("创建直播流成功");
     }
 

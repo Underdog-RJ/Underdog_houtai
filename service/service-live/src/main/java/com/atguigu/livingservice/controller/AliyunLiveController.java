@@ -6,6 +6,7 @@ import com.atguigu.commonutils.R;
 
 import com.atguigu.livingservice.entity.EduLiving;
 import com.atguigu.livingservice.service.EduLivingService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,9 @@ public class AliyunLiveController {
 
     @Autowired
     private EduLivingService eduLivingService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     /**
@@ -63,10 +67,10 @@ public class AliyunLiveController {
         return R.ok().data("livingInfo",livingInfo);
     }
 
-    @DeleteMapping("removeLivingById/{teacherId}")
-    public R removeLivingById(@PathVariable String teacherId){
-
-       return eduLivingService.removeLivingById(teacherId);
+    @DeleteMapping("removeLivingById")
+    public R removeLivingById(@RequestBody EduLiving eduLiving){
+        rabbitTemplate.convertAndSend("living-event-exchange","living.release.living",eduLiving.getId());
+         return eduLivingService.removeLivingById(eduLiving.getTeacherId());
 
     }
 
