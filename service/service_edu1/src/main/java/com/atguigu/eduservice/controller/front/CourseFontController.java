@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,7 @@ public class CourseFontController {
 
         //根据课程Id查询章节和小节
         List<ChapterVo> chapterVideoList = eduChapterService.getChapterVideoByCourseId(courseId);
+        Cookie[] cookies = request.getCookies();
         String token = request.getHeader("token");
 
         //根据课程id和用户id查询当前课程是否已经支付过了

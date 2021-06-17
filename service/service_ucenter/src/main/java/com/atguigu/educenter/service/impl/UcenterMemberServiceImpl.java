@@ -16,7 +16,7 @@ import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 
 import com.atguigu.educenter.vo.UcentmentberVo;
-import com.atguigu.eduservice.entity.UnReadMessage;
+
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

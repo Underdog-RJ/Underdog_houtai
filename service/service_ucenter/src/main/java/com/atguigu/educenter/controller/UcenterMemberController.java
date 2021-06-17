@@ -12,7 +12,7 @@ import com.atguigu.educenter.utils.HttpClientUtils;
 import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 import com.atguigu.educenter.vo.UcentmentberVo;
-import com.atguigu.eduservice.entity.UnReadMessage;
+
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.google.gson.Gson;
 import org.springframework.beans.BeanUtils;
