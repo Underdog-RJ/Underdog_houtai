@@ -2,8 +2,11 @@ package com.atguigu.livingservice.service;
 
 import com.atguigu.commonutils.R;
 import com.atguigu.livingservice.entity.EduLiving;
+import com.atguigu.livingservice.entity.MessageType;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -30,4 +33,17 @@ public interface EduLivingService extends IService<EduLiving> {
 
 
     EduLiving getLiveInfoById(String teacherId);
+
+    R uploadAlyiVideo(MultipartFile file, String currendLivingId, HttpServletRequest request);
+
+    R deleteAliyunvod(String id, HttpServletRequest request);
+
+    List<EduLiving> getAllLivingAge();
+
+
+    R getLiveInfoByIdAgo(String id);
+
+    void insert(MessageType message);
+
+    R getAllRecordById(String id,String memberId);
 }

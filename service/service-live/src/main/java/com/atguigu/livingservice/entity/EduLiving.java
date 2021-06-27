@@ -33,11 +33,16 @@ public class EduLiving implements Serializable {
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
+    @TableField(exist = false)
+    private int type;
+
     private String teacherId;
 
     private String livingName;
 
     private String timeHours;
+
+    private String videoId;
 
 
     @ApiModelProperty(value = "创建时间")

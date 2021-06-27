@@ -38,7 +38,12 @@ public class CourseFontController {
 
     //1 条件查询带分页查询课程
     @PostMapping("getFrontCourseList/{page}/{limit}")
-    public R getFrontCourseList(@PathVariable long page, @PathVariable long limit, @RequestBody(required = false)CourseFrontVo courseFrontVo){
+    public R getFrontCourseList(@PathVariable long page,
+                                @PathVariable long limit,
+                                @RequestBody(required = false)CourseFrontVo courseFrontVo,
+                                HttpServletRequest request){
+
+        String token = request.getHeader("token");
         Page<EduCourse> pageCourse=new Page<>(page,limit);
 
         Map<String,Object> map= eduCourseService.getCourseFrontList(pageCourse,courseFrontVo);
