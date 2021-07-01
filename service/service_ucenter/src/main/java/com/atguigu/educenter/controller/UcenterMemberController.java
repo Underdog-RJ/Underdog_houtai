@@ -299,5 +299,10 @@ public class UcenterMemberController {
 
         return  ucenterMemberService.resetPassword(resetPasswordVo);
     }
+
+    @GetMapping("updateUseruCoin/{count}")
+    public boolean updateUseruCoin(@PathVariable Integer count,HttpServletRequest request){
+       return ucenterMemberService.updateUseruCoin(request,count);
+    }
 }
 

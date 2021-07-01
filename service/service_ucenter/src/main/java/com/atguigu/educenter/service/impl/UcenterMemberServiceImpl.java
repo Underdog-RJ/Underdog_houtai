@@ -578,4 +578,22 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         return formatDate(date, "yyyyMM");
     }
 
+    @Override
+    public boolean updateUseruCoin(HttpServletRequest request, Integer count) {
+
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        if(StringUtils.isEmpty(userId)){
+            return false;
+        }
+        UcenterMember ucenterMember = baseMapper.selectById(userId);
+        ucenterMember.setUCoin(count);
+        int i = baseMapper.updateById(ucenterMember);
+        if(i>0){
+            return true;
+        }else {
+            return false;
+        }
+
+
+    }
 }

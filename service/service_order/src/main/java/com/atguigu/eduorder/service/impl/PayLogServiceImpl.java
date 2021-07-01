@@ -1,7 +1,13 @@
 package com.atguigu.eduorder.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.atguigu.commonutils.JwtUtils;
+import com.atguigu.commonutils.R;
+import com.atguigu.commonutils.order.CourseWebVoOrder;
+import com.atguigu.commonutils.order.UcenterMemberOrder;
 import com.atguigu.eduorder.client.EduClient;
+import com.atguigu.eduorder.client.UcenterClient;
 import com.atguigu.eduorder.entity.Order;
 import com.atguigu.eduorder.entity.PayLog;
 import com.atguigu.eduorder.mapper.PayLogMapper;
@@ -14,11 +20,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.wxpay.sdk.WXPayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * <p>
@@ -37,10 +46,37 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
     @Autowired
     private EduClient eduClient;
 
+    @Autowired
+    private UcenterClient ucenterClient;
+
+    @Override
+    public Map createNative(String orderNo) {
+        try {
+            //根据订单号查询订单信息
+            QueryWrapper<Order> wrapper =new QueryWrapper<>();
+            wrapper.eq("order_no",orderNo);
+            Order order = orderService.getOne(wrapper);
+            
+            //返回数据的封装
+            Map map = new HashMap<>();
+            map.put("out_trade_no", orderNo);
+            map.put("course_id", order.getCourseId());
+            map.put("total_fee", order.getTotalFee());
+            map.put("course_name",order.getCourseTitle());
+            String url = JSONObject.toJSONString(map);
+            System.out.println(url);
+            map.put("code_url",url );//二维码地址
+            return map;
+
+        } catch (Exception e) {
+            throw new GuliException(20001,"生成二维码失败");
+        }
+    }
+
 
 
     //生成微信二维码
-    @Override
+  /*  @Override
     public Map createNative(String orderNo) {
         try {
             //根据订单号查询订单信息
@@ -88,12 +124,10 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
         } catch (Exception e) {
             throw new GuliException(20001,"生成二维码失败");
         }
-
-
-    }
+    }*/
 
     //查询订单字符状态
-    @Override
+    /*@Override
     public Map<String, String> queryPayStatus(String orderNo) {
         try {
             //1、封装参数
@@ -108,7 +142,7 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
             client.setXmlParam(WXPayUtil.generateSignedXml(m,"T6m9iK73b0kn9g5v426MKfHQH7X8rKwb"));
             client.setHttps(true);
             client.post();
-            
+
             //得到请求返回内容
             String xml = client.getContent();
             Map<String, String> resultMap = WXPayUtil.xmlToMap(xml);
@@ -119,6 +153,23 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
             return null;
         }
 
+    }*/
+
+    @Override
+    public boolean queryPayStatus(String orderNo) {
+
+
+
+            QueryWrapper<Order> orderQueryWrapper=new QueryWrapper<>();
+            orderQueryWrapper.eq("order_no",orderNo);
+          Order order = orderService.getOne(orderQueryWrapper);
+
+          int status = order.getStatus().intValue();
+            if(status==1){
+                return true;
+            }
+            //转换map在返回
+            return false;
     }
 
     //添加支付记录和更新订单状态
@@ -142,9 +193,35 @@ public class PayLogServiceImpl extends ServiceImpl<PayLogMapper, PayLog> impleme
         payLog.setPayTime(new Date());
         payLog.setPayType(1);//支付类型
         payLog.setTotalFee(order.getTotalFee());//总金额(分)
-        payLog.setTradeState(map.get("trade_state"));//支付状态
-        payLog.setTransactionId(map.get("transaction_id"));//流水号
+        payLog.setTradeState("SUCCESS");//支付状态
+        payLog.setTransactionId(UUID.randomUUID().toString());//流水号
         payLog.setAttr(JSONObject.toJSONString(map));
         baseMapper.insert(payLog);//插入到支付日志表
+    }
+
+    @Override
+    public R toPay(HttpServletRequest request, Map map) {
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        if(StringUtils.isEmpty(userId)){
+            return R.ok().code(28004);
+        }
+        UcenterMemberOrder userInfoOrder = ucenterClient.getUserInfoOrder(userId);
+
+
+        BigDecimal uCoin=new BigDecimal(userInfoOrder.getUCoin());
+        String courseId=(String) map.get("course_id");
+        CourseWebVoOrder courseInfoOrder = eduClient.getCourseInfoOrder(courseId);
+        BigDecimal price = courseInfoOrder.getPrice();
+        if(uCoin.compareTo(price)==-1){
+            return R.error().message("余额不足");
+        }
+        Integer count = uCoin.subtract(price).intValue();
+        String token = request.getHeader("token");
+        boolean flag = ucenterClient.updateUseruCoin(count, token);
+        if(!flag){
+            return R.error().message("错误");
+        }
+        updateOrderStatus(map);
+        return R.ok().message("支付成功");
     }
 }

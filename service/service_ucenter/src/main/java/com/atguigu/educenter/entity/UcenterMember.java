@@ -79,4 +79,6 @@ public class UcenterMember implements Serializable {
 
     private int mailType;
 
+    private int uCoin;
+
 }
