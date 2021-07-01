@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,8 @@ public class TeacherFrontController {
 
     //讲师详情
     @GetMapping("getTeacherFrontInfo/{teacherId}")
-    public R getTeacherFrontInfo(@PathVariable String teacherId) {
+    public R getTeacherFrontInfo(@PathVariable String teacherId, HttpServletRequest request) {
+        String token = request.getHeader("token");
         //1.根据讲师id查询讲师基本信息
         EduTeacher eduTeacher = teacherService.getById(teacherId);
 

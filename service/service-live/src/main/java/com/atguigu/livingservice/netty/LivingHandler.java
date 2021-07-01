@@ -2,6 +2,8 @@ package com.atguigu.livingservice.netty;
 
 import com.alibaba.fastjson.JSON;
 import com.atguigu.livingservice.entity.MessageType;
+import com.atguigu.livingservice.service.EduLivingService;
+import com.atguigu.livingservice.util.SpringUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -47,6 +49,7 @@ public class LivingHandler extends SimpleChannelInboundHandler<TextWebSocketFram
         System.out.println("接受到消息数据为："+text);
         MessageType message = JSON.parseObject(text, MessageType.class);
         String livingId = message.getLivingId();
+        EduLivingService livingService = SpringUtil.getBean(EduLivingService.class);
         switch (message.getType()){
             //处理客户端连接的消息
             case 0:
@@ -68,6 +71,7 @@ public class LivingHandler extends SimpleChannelInboundHandler<TextWebSocketFram
                 break;
             case 1:
                 if(map.containsKey(livingId)){
+                    livingService.insert(message);
                     List<Channel> list = map.get(livingId);
                     message.setCount(list.size());
                     for (Channel channel : list) {
