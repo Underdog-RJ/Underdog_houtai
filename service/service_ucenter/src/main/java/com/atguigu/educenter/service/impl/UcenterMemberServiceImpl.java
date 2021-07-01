@@ -23,10 +23,15 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.BitFieldSubCommands;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -432,4 +437,145 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         }
         return member;
     }
+
+
+    @Override
+    public R userSign(HttpServletRequest request) {
+
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        if(StringUtils.isEmpty(userId)){
+            return R.ok().code(28004);
+        }
+        boolean flag = doSign(userId, LocalDate.now());
+
+        return R.ok().data("flag",flag);
+    }
+
+    @Override
+    public R checkSign(HttpServletRequest request) {
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        if(StringUtils.isEmpty(userId)){
+            return R.ok().code(28004);
+        }
+        boolean flag = checkSign(userId, LocalDate.now());
+
+        return R.ok().data("flag",flag);
+    }
+
+    @Override
+    public R userSignCount(HttpServletRequest request) {
+        String userId = JwtUtils.getMemberIdByJwtToken(request);
+        if(StringUtils.isEmpty(userId)){
+            return R.ok().code(28004);
+        }
+        long signCount = getSignCount(userId, LocalDate.now());
+
+        return R.ok().data("count",signCount);
+    }
+
+    /**
+     * 获取用户签到次数
+     *
+     * @param uid  用户ID
+     * @param date 日期
+     * @return 当前的签到次数
+     */
+    public long getSignCount(String uid, LocalDate date) {
+        String key = buildSignKey(uid, date);
+        long continuousSignCount = getContinuousSignCount(uid, date);
+        return getBitCount(key);
+    }
+
+    public Long getBitCount(String key){
+
+        return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes()));
+    }
+
+    /**
+     * 获取当月连续签到次数
+     *
+     * @param uid  用户ID
+     * @param date 日期
+     * @return 当月连续签到次数
+     */
+    public long getContinuousSignCount(String uid, LocalDate date) {
+        int signCount = 0;
+        String type = String.format("u%d", date.getDayOfMonth());
+        List<Long> list = bitfield(buildSignKey(uid, date), date.getDayOfMonth(),0);
+        if (list != null && list.size() > 0) {
+            // 取低位连续不为0的个数即为连续签到次数，需考虑当天尚未签到的情况
+            long v = list.get(0) == null ? 0 : list.get(0);
+            for (int i = 0; i < date.getDayOfMonth(); i++) {
+                if (v >> 1 << 1 == v) {
+                    // 低位为0且非当天说明连续签到中断了
+                    if (i > 0) break;
+                } else {
+                    signCount += 1;
+                }
+                v >>= 1;
+            }
+        }
+        return signCount;
+    }
+
+    /**
+     *
+     * @param buildSignKey bitmap的key
+     * @param limit 到那位结束
+     * @param offset
+     * @return
+     */
+    public List<Long> bitfield(String buildSignKey,int limit,int offset){
+        return redisTemplate.execute(
+                (RedisCallback<List<Long>>) con-> con.bitField(buildSignKey.getBytes(),
+                        BitFieldSubCommands.
+                                create().
+                                get(BitFieldSubCommands.BitFieldType.unsigned(limit)).valueAt(offset)));
+    }
+    /**
+     * 检查用户是否签到
+     *
+     * @param uid  用户ID
+     * @param date 日期
+     * @return 当前的签到状态
+     */
+    public boolean checkSign(String uid, LocalDate date) {
+        int offset = date.getDayOfMonth() - 1;
+        return redisTemplate.opsForValue().getBit(buildSignKey(uid, date), offset);
+    }
+
+
+    /**
+     * 用户签到
+     *
+     * @param uid  用户ID
+     * @param date 日期
+     * @return 之前的签到状态
+     */
+    public boolean doSign(String uid, LocalDate date) {
+        int offset = date.getDayOfMonth() - 1;
+
+        return redisTemplate.opsForValue().setBit(buildSignKey(uid, date), offset, true);
+    }
+
+
+    /**
+     * String.format()  %s代表字符串，%d代表数字
+     * @param uid
+     * @param date
+     * @return
+     */
+    private static String buildSignKey(String uid, LocalDate date) {
+        return String.format("u:sign:%s:%s", uid, formatDate(date));
+    }
+
+    private static String formatDate(LocalDate date, String pattern) {
+        return date.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+
+    private static String formatDate(LocalDate date) {
+        return formatDate(date, "yyyyMM");
+    }
+
 }

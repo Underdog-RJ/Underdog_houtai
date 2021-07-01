@@ -58,6 +58,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setNickname(ucenterMember.getNickname());
 
         order.setStatus(0); //订单状态
+
         order.setPayType(1); //订单类型
 
         baseMapper.insert(order);

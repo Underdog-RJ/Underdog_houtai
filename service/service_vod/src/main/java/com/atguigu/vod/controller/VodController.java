@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+
+
 @RestController
 @RequestMapping("/eduvod/video")
 public class VodController {
@@ -69,6 +71,7 @@ public class VodController {
             request.setVideoId(id);
             //调用方法得到凭证
             GetVideoPlayAuthResponse response = client.getAcsResponse(request);
+
             String playAuth = response.getPlayAuth();
             System.out.println(playAuth);
             return R.ok().data("playAuth",playAuth);
