@@ -6,6 +6,7 @@ import com.atguigu.eduorder.service.PayLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -23,6 +24,12 @@ public class PayLogController {
     @Autowired
     private PayLogService payLogService;
 
+    @PostMapping("toPay")
+    private R toPay(HttpServletRequest request,@RequestBody Map map){
+
+        return  payLogService.toPay(request,map);
+    }
+
     //生成微信值父二维码接口
     //参数式订单号
     @GetMapping("createNative/{orderNo}")
@@ -39,14 +46,12 @@ public class PayLogController {
     @GetMapping("/queryPayStatus/{orderNo}")
     public R queryPayStatus(@PathVariable String orderNo) {
         //调用查询接口
-        Map<String, String> map = payLogService.queryPayStatus(orderNo);
-        System.out.println("返回订单状态map集合："+map);
-        if (map == null) {//出错
+        boolean flag= payLogService.queryPayStatus(orderNo);
+        if (flag==false) {//出错
             return R.error().message("支付出错");
         }
-        if (map.get("trade_state").equals("SUCCESS")) {//如果成功
+        if (flag) {//如果成功
             //更改订单状态
-            payLogService.updateOrderStatus(map);
             return R.ok().message("支付成功");
         }
 

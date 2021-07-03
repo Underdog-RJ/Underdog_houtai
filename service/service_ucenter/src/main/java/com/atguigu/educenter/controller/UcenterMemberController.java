@@ -41,6 +41,35 @@ public class UcenterMemberController {
     @Autowired
     private UcenterMemberZhuyeService ucenterMemberZhuyeService;
 
+    /**
+     * 用户签到
+     * @param request
+     * @return
+     */
+    @GetMapping("userSign")
+    public R userSign(HttpServletRequest request){
+        return ucenterMemberService.userSign(request);
+    }
+
+    /**
+     * 检测用户是否签到
+     * @param request
+     * @return
+     */
+    @GetMapping("checkSign")
+    public R checkSign(HttpServletRequest request){
+        return ucenterMemberService.checkSign(request);
+    }
+
+    /**
+     * 检测用户按月签到数量
+     * @param request
+     * @return
+     */
+    @GetMapping("userSignCount")
+    public R userSignCount(HttpServletRequest request){
+        return ucenterMemberService.userSignCount(request);
+    }
     //登录
     @PostMapping("login")
     public R loginUser(@RequestBody UcenterMember ucenterMember){
@@ -269,6 +298,11 @@ public class UcenterMemberController {
     public R resetPassword(@RequestBody ResetPasswordVo resetPasswordVo){
 
         return  ucenterMemberService.resetPassword(resetPasswordVo);
+    }
+
+    @GetMapping("updateUseruCoin/{count}")
+    public boolean updateUseruCoin(@PathVariable Integer count,HttpServletRequest request){
+       return ucenterMemberService.updateUseruCoin(request,count);
     }
 }
 

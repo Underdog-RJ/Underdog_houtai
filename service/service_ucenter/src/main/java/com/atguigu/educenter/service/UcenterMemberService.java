@@ -11,6 +11,7 @@ import com.atguigu.educenter.vo.UcentmentberVo;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -59,4 +60,12 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     R resetPassword(ResetPasswordVo resetPasswordVo);
 
     UcenterMember loginUser(String code);
+
+    R userSign(HttpServletRequest request);
+
+    R checkSign(HttpServletRequest request);
+
+    R userSignCount(HttpServletRequest request);
+
+    boolean updateUseruCoin(HttpServletRequest request, Integer count);
 }
