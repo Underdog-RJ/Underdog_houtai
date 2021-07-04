@@ -19,4 +19,7 @@ public interface UcenterClient {
     @GetMapping("/educenter/member/updateUseruCoin/{count}")
     boolean updateUseruCoin(@PathVariable("count") Integer count, @RequestHeader(name = "token", required = true) String token);
 
+    @GetMapping("/educenter/member/updateUseruCoinById/{count}/{id}")
+    boolean updateUseruCoinById(@PathVariable("count") Integer count, @PathVariable("id") String id);
+
 }

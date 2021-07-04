@@ -652,4 +652,19 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
 
     }
+
+    @Override
+    public boolean updateUseruCoinById(Integer count, String id) {
+        if(StringUtils.isEmpty(id)){
+            return false;
+        }
+        UcenterMember ucenterMember = baseMapper.selectById(id);
+        ucenterMember.setUCoin(count);
+        int i = baseMapper.updateById(ucenterMember);
+        if(i>0){
+            return true;
+        }else {
+            return false;
+        }
+    }
 }

@@ -304,5 +304,10 @@ public class UcenterMemberController {
     public boolean updateUseruCoin(@PathVariable Integer count,HttpServletRequest request){
        return ucenterMemberService.updateUseruCoin(request,count);
     }
+
+    @GetMapping("updateUseruCoinById/{count}/{id}")
+    public boolean updateUseruCoinById(@PathVariable Integer count,@PathVariable String id){
+        return ucenterMemberService.updateUseruCoinById(count,id);
+    }
 }
 

@@ -14,4 +14,9 @@ public class UcenterClientImpl implements UcenterClient {
     public boolean updateUseruCoin(Integer count, String token) {
         return false;
     }
+
+    @Override
+    public boolean updateUseruCoinById(Integer count, String id) {
+        return false;
+    }
 }
