@@ -2,6 +2,7 @@ package com.atguigu.eduservice.service;
 
 import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.entity.EduBlog;
+import com.atguigu.eduservice.entity.EduBlogTop;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -18,14 +19,8 @@ import java.util.Map;
  * @author Zhang zhengxu
  * @since 2021-02-03
  */
-public interface EduBlogService extends IService<EduBlog> {
+public interface EduBlogTopService extends IService<EduBlogTop> {
 
-    IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery, HttpServletRequest request);
 
-    Map<String, Object> findBypageFront(long page, long limit, BlogQuery blogQuery);
-
-    List<EduBlog> getBlogByUserId(String id);
-
-    R addBlogInfo(EduBlog eduBlog, HttpServletRequest request);
 
 }

@@ -60,6 +60,9 @@ public class BlogEnjoyController {
     @GetMapping("IsEnjoyBlog/{id}")
     public R IsEnjoyBlog(@PathVariable String id, HttpServletRequest request){
         Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
+        if(StringUtils.isEmpty(userIdByJwtToken)){
+            return R.ok();
+        }
         String userId = userIdByJwtToken.get("id");
         if(StringUtils.isEmpty(userId))
         {

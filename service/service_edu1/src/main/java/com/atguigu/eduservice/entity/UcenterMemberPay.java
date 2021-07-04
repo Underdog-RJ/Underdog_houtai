@@ -54,4 +54,15 @@ public class UcenterMemberPay {
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
+
+    private String address;
+
+    private String signature;
+
+    private String mail;
+
+    private int mailType;
+
+
+    private Integer uCoin;
 }

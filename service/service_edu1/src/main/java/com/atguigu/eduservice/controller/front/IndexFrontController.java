@@ -3,9 +3,11 @@ package com.atguigu.eduservice.controller.front;
 
 import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.entity.EduBlog;
+import com.atguigu.eduservice.entity.EduBlogTop;
 import com.atguigu.eduservice.entity.EduCourse;
 import com.atguigu.eduservice.entity.EduTeacher;
 import com.atguigu.eduservice.service.EduBlogService;
+import com.atguigu.eduservice.service.EduBlogTopService;
 import com.atguigu.eduservice.service.EduCourseService;
 import com.atguigu.eduservice.service.EduTeacherService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -31,6 +33,9 @@ public class IndexFrontController {
     @Autowired
     private EduBlogService eduBlogService;
 
+    @Autowired
+    private EduBlogTopService eduBlogTopService;
+
     //查询前8条热门记录，查询前4条名师
     @GetMapping("index")
     public R index(){
@@ -47,11 +52,11 @@ public class IndexFrontController {
         List<EduTeacher> teacherList = eduTeacherService.list(wrapperTeacher);
 
         //查询前8条热门微博
-        QueryWrapper<EduBlog> wrapperBlog=new QueryWrapper<>();
-        wrapperBlog.orderByDesc("id");
+        QueryWrapper<EduBlogTop> wrapperBlog=new QueryWrapper<>();
+        wrapperBlog.orderByDesc("gmt_create");
         wrapperBlog.last("limit 8");
 
-        List<EduBlog> blogList = eduBlogService.list(wrapperBlog);
+        List<EduBlogTop> blogList = eduBlogTopService.list(wrapperBlog);
 
         return R.ok().data("eduList",eduList).data("teacherList",teacherList).data("blogList",blogList);
     }

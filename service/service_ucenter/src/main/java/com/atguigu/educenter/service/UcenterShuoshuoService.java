@@ -5,6 +5,7 @@ import com.atguigu.educenter.entity.ResetPasswordVo;
 import com.atguigu.educenter.entity.UcenterShuoshuo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -20,5 +21,5 @@ public interface UcenterShuoshuoService extends IService<UcenterShuoshuo> {
     List<UcenterShuoshuo> getShuoshuoById(String id);
 
 
-
+    R addShuoshuo(UcenterShuoshuo ucenterShuoshuo, HttpServletRequest request);
 }

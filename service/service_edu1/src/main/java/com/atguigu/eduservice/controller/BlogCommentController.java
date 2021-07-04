@@ -66,19 +66,8 @@ public class BlogCommentController {
     @ApiOperation(value = "添加评论")
     @PostMapping("auth/save")
     public R save(@RequestBody BlogComment comment, HttpServletRequest request) {
-        String memberId = JwtUtils.getMemberIdByJwtToken(request);
-        if(StringUtils.isEmpty(memberId)) {
-            return R.error().code(28004).message("请登录");
-        }
-        comment.setMemberId(memberId);
 
-        UcenterMemberPay ucenterInfo = ucenterClient.getUcenterPay(memberId);
-
-        comment.setNickname(ucenterInfo.getNickname());
-        comment.setAvatar(ucenterInfo.getAvatar());
-
-        blogCommentService.save(comment);
-        return R.ok();
+        return blogCommentService.addCommit(comment,request);
     }
 
 }

@@ -62,11 +62,11 @@ public class UcenterMemberController {
     }
 
     /**
-     * 检测用户按月签到数量
+     * 检测用户按月签到情况
      * @param request
-     * @return
+     * @return  连续，和总共
      */
-    @GetMapping("userSignCount")
+    @GetMapping("userSignCountInfo")
     public R userSignCount(HttpServletRequest request){
         return ucenterMemberService.userSignCount(request);
     }
@@ -303,6 +303,11 @@ public class UcenterMemberController {
     @GetMapping("updateUseruCoin/{count}")
     public boolean updateUseruCoin(@PathVariable Integer count,HttpServletRequest request){
        return ucenterMemberService.updateUseruCoin(request,count);
+    }
+
+    @GetMapping("updateUseruCoinById/{count}/{id}")
+    public boolean updateUseruCoinById(@PathVariable Integer count,@PathVariable String id){
+        return ucenterMemberService.updateUseruCoinById(count,id);
     }
 }
 
