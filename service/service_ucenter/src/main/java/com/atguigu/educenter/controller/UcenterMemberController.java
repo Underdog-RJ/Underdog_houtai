@@ -62,11 +62,11 @@ public class UcenterMemberController {
     }
 
     /**
-     * 检测用户按月签到数量
+     * 检测用户按月签到情况
      * @param request
-     * @return
+     * @return  连续，和总共
      */
-    @GetMapping("userSignCount")
+    @GetMapping("userSignCountInfo")
     public R userSignCount(HttpServletRequest request){
         return ucenterMemberService.userSignCount(request);
     }

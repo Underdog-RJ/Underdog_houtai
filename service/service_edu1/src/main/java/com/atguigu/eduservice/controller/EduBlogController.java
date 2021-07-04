@@ -67,18 +67,8 @@ public class EduBlogController {
     @PostMapping("addBlogInfo")
     public R addBlogInfo(@RequestBody EduBlog eduBlog,HttpServletRequest request){
 
-        Map<String,String> user = JwtUtils.getUserIdByJwtToken(request);
 
-        eduBlog.setAuthorId(user.get("id"));
-        eduBlog.setAuthorNickname(user.get("nickname"));
-        eduBlog.setPublished(true);
-        eduBlog.setRecommend(true);
-        eduBlog.setAppreciation(true);
-        eduBlog.setShareStatement(true);
-        eduBlog.setFlag("Normal");
-        eduBlog.setViewCount(1);
-        eduBlogService.save(eduBlog);
-        return R.ok();
+        return eduBlogService.addBlogInfo(eduBlog,request);
     }
 
     @PostMapping("getBlogByUserId")

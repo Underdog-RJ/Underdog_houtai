@@ -1,7 +1,10 @@
 package com.atguigu.eduservice.service.impl;
 
 import com.atguigu.commonutils.JwtUtils;
+import com.atguigu.commonutils.R;
+import com.atguigu.eduservice.client.UcenterClient;
 import com.atguigu.eduservice.entity.EduBlog;
+import com.atguigu.eduservice.entity.UcenterMemberPay;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.atguigu.eduservice.mapper.EduBlogMapper;
 import com.atguigu.eduservice.service.EduBlogService;
@@ -11,10 +14,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +40,11 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     @Autowired
     private EduBlogMapper eduBlogMapper;
 
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
+
+    @Autowired
+    private UcenterClient ucenterClient;
 
     @Override
     public IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery, HttpServletRequest request) {
@@ -130,6 +141,73 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         return eduBlogMapper.getBlogByUserId(id);
 
     }
+
+    @Override
+    public R addBlogInfo(EduBlog eduBlog, HttpServletRequest request) {
+        Map<String,String> user = JwtUtils.getUserIdByJwtToken(request);
+        if(StringUtils.isEmpty(user)){
+            return R.error();
+        }
+        String id = user.get("id");
+        eduBlog.setAuthorId(id);
+        eduBlog.setAuthorNickname(user.get("nickname"));
+        eduBlog.setPublished(true);
+        eduBlog.setRecommend(true);
+        eduBlog.setAppreciation(true);
+        eduBlog.setShareStatement(true);
+        eduBlog.setFlag("Normal");
+        eduBlog.setViewCount(1);
+        baseMapper.insert(eduBlog);
+        //检测用户今天是否已经签到
+        boolean flag = checkSign(id, LocalDate.now());
+        UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(id);
+        if(!flag){
+            //没签到则更新为签到，并且更改用户的u币
+            doSign(id,LocalDate.now());
+
+            Integer uCoin = ucenterPay.getUCoin();
+            ucenterPay.setUCoin(uCoin+10);
+            ucenterClient.updateUseruCoin(uCoin+10,request.getHeader("token"));
+        }
+
+        return R.ok().data("userInfo",ucenterPay);
+    }
+
+    public boolean doSign(String uid, LocalDate date) {
+        int offset = date.getDayOfMonth() - 1;
+
+        return redisTemplate.opsForValue().setBit(buildSignKey(uid, date), offset, true);
+    }
+
+    public boolean checkSign(String uid, LocalDate date) {
+        int offset = date.getDayOfMonth() - 1;
+        return redisTemplate.opsForValue().getBit(buildSignKey(uid, date), offset);
+    }
+
+
+
+
+    /**
+     * String.format()  %s代表字符串，%d代表数字
+     * @param uid
+     * @param date
+     * @return
+     */
+    private static String buildSignKey(String uid, LocalDate date) {
+        return String.format("blog:sign:%s:%s", uid, formatDate(date));
+    }
+
+    private static String formatDate(LocalDate date) {
+        return formatDate(date, "yyyyMM");
+    }
+
+    private static String formatDate(LocalDate date, String pattern) {
+        return date.format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+
+
+
 
 
 }

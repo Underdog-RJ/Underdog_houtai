@@ -9,4 +9,9 @@ public class UcenterClientImpl implements UcenterClient {
     public UcenterMemberPay getUcenterPay(String memberId) {
         return null;
     }
+
+    @Override
+    public boolean updateUseruCoin(Integer count, String token) {
+        return false;
+    }
 }

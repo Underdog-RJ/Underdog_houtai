@@ -1,5 +1,6 @@
 package com.atguigu.eduservice.service;
 
+import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,4 +25,7 @@ public interface EduBlogService extends IService<EduBlog> {
     Map<String, Object> findBypageFront(long page, long limit, BlogQuery blogQuery);
 
     List<EduBlog> getBlogByUserId(String id);
+
+    R addBlogInfo(EduBlog eduBlog, HttpServletRequest request);
+
 }

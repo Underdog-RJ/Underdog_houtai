@@ -143,7 +143,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         member.setPassword(MD5.encrypt(password));
         member.setIsDisabled(false);
         member.setAvatar("http://thirdwx.qlogo.cn/mmopen/vi_32/DYAIOgq83eoj0hHXhgJNOTSOFsS4uZs8x1ConecaVOB8eIl115xmJZcT4oCicvia7wMEufibKtTLqiaJeanU2Lpg3w/132");
-
+        member.setUCoin(200);
         this.save(member);
     }
     @Override
@@ -357,6 +357,10 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             return R.error().message("手机号重复");
         }
         UcenterMember ucenterMember = baseMapper.selectById(userId);
+        if(StringUtils.isEmpty(ucenterMember.getMobile())){
+            int uCoin = ucenterMember.getUCoin();
+            ucenterMember.setUCoin(uCoin+100);
+        }
         ucenterMember.setMobile(mobile);
         baseMapper.updateById(ucenterMember);
         return R.ok().message("绑定成功");
@@ -376,6 +380,10 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             return R.error().message("邮箱重复");
         }
         UcenterMember ucenterMember = baseMapper.selectById(memeberId);
+        if(StringUtils.isEmpty(ucenterMember.getMail())){
+            int uCoin = ucenterMember.getUCoin();
+            ucenterMember.setUCoin(uCoin+100);
+        }
         ucenterMember.setMail(mail);
         baseMapper.updateById(ucenterMember);
         return R.ok().message("绑定成功");
@@ -386,6 +394,10 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     public UcenterMember updateUserPassword(String userId, String password) {
         UcenterMember ucenterMember = baseMapper.selectById(userId);
         if(ucenterMember!=null){
+            if(StringUtils.isEmpty(ucenterMember.getPassword())){
+                int uCoin = ucenterMember.getUCoin();
+                ucenterMember.setUCoin(uCoin+100);
+            }
             ucenterMember.setPassword(MD5.encrypt(password));
             baseMapper.updateById(ucenterMember);
             return ucenterMember;
@@ -433,6 +445,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             member.setNickname(nickname);
             member.setAvatar(avatar);
             member.setSex(sex);
+            member.setUCoin(100);
             baseMapper.insert(member);
         }
         return member;
@@ -447,8 +460,40 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             return R.ok().code(28004);
         }
         boolean flag = doSign(userId, LocalDate.now());
+        long continuousSignCount = getContinuousSignCount(userId, LocalDate.now());
 
-        return R.ok().data("flag",flag);
+        int count=(int)continuousSignCount;
+        UcenterMember ucenterMember = baseMapper.selectById(userId);
+        if(flag){
+            switch (count){
+                case 1:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+1));
+                    break;
+                case 2:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+2));
+                    break;
+                case 3:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+3));
+                    break;
+                case 4:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+4));
+                    break;
+                case 5:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+5));
+                    break;
+                case 6:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+6));
+                    break;
+                case 7:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+7));
+                    break;
+                default:
+                    baseMapper.updateById(ucenterMember.setUCoin(ucenterMember.getUCoin()+7));
+                    break;
+            }
+        }
+
+        return R.ok().data("flag",flag).data("userInfo",ucenterMember);
     }
 
     @Override
@@ -469,8 +514,8 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
             return R.ok().code(28004);
         }
         long signCount = getSignCount(userId, LocalDate.now());
-
-        return R.ok().data("count",signCount);
+        long continuousSignCount = getContinuousSignCount(userId, LocalDate.now());
+        return R.ok().data("countMonth",signCount).data("countCountinuous",continuousSignCount);
     }
 
     /**
@@ -482,10 +527,14 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
      */
     public long getSignCount(String uid, LocalDate date) {
         String key = buildSignKey(uid, date);
-        long continuousSignCount = getContinuousSignCount(uid, date);
         return getBitCount(key);
     }
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     public Long getBitCount(String key){
 
         return redisTemplate.execute((RedisCallback<Long>) con -> con.bitCount(key.getBytes()));
@@ -568,16 +617,23 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     private static String buildSignKey(String uid, LocalDate date) {
         return String.format("u:sign:%s:%s", uid, formatDate(date));
     }
+    private static String formatDate(LocalDate date) {
+        return formatDate(date, "yyyyMM");
+    }
 
     private static String formatDate(LocalDate date, String pattern) {
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
 
 
-    private static String formatDate(LocalDate date) {
-        return formatDate(date, "yyyyMM");
-    }
 
+
+    /**
+     * 远程调用，购买课程的接口
+     * @param request
+     * @param count
+     * @return
+     */
     @Override
     public boolean updateUseruCoin(HttpServletRequest request, Integer count) {
 

@@ -77,11 +77,7 @@ public class UcenterShuoshuoController {
     //添加课程分类
     @PostMapping("addshuoshuo")
     public R addShuoshuo(@RequestBody UcenterShuoshuo ucenterShuoshuo,HttpServletRequest request){
-        System.out.println("方法执行了");
-        Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
-        ucenterShuoshuo.setAclUserId(userIdByJwtToken.get("id"));
-        ucenterShuoshuoService.save(ucenterShuoshuo);
-        return R.ok();
+        return ucenterShuoshuoService.addShuoshuo(ucenterShuoshuo,request);
     }
 
 
