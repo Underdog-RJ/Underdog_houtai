@@ -549,22 +549,31 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
      */
     public long getContinuousSignCount(String uid, LocalDate date) {
         int signCount = 0;
+        int max=0;
         String type = String.format("u%d", date.getDayOfMonth());
         List<Long> list = bitfield(buildSignKey(uid, date), date.getDayOfMonth(),0);
         if (list != null && list.size() > 0) {
             // 取低位连续不为0的个数即为连续签到次数，需考虑当天尚未签到的情况
             long v = list.get(0) == null ? 0 : list.get(0);
             for (int i = 0; i < date.getDayOfMonth(); i++) {
+                System.out.println(v>>1);
+                System.out.println(v<<1);
+                System.out.println(v>>1<<1);
                 if (v >> 1 << 1 == v) {
                     // 低位为0且非当天说明连续签到中断了
-                    if (i > 0) break;
+                    if (i > 0){
+                        if(signCount>max){
+                            max=signCount;
+                            signCount=0;
+                        }
+                    }
                 } else {
                     signCount += 1;
                 }
                 v >>= 1;
             }
         }
-        return signCount;
+        return max;
     }
 
     /**
