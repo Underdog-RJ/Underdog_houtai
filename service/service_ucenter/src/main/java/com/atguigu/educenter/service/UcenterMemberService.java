@@ -68,4 +68,7 @@ public interface UcenterMemberService extends IService<UcenterMember> {
     R userSignCount(HttpServletRequest request);
 
     boolean updateUseruCoin(HttpServletRequest request, Integer count);
+
+    boolean updateUseruCoinById( Integer count,String id);
+
 }

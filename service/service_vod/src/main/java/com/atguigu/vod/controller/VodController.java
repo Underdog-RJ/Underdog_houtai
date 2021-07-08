@@ -2,9 +2,7 @@ package com.atguigu.vod.controller;
 
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.vod.model.v20170321.DeleteVideoRequest;
-import com.aliyuncs.vod.model.v20170321.GetVideoPlayAuthRequest;
-import com.aliyuncs.vod.model.v20170321.GetVideoPlayAuthResponse;
+import com.aliyuncs.vod.model.v20170321.*;
 import com.atguigu.commonutils.R;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.atguigu.vod.service.VodService;
@@ -13,6 +11,8 @@ import com.atguigu.vod.utils.InitVodClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.security.PermitAll;
 import java.util.List;
 
 
@@ -22,6 +22,32 @@ public class VodController {
 
     @Autowired
     private VodService vodService;
+
+    // 获取视频播放地址mp4
+    @GetMapping("getMp4Url/{id}")
+    public R getMp4Url(@PathVariable String id){
+        try {
+            //创建初始化对象
+            DefaultAcsClient client = InitVodClient.initVodClient(ConstantVodUtils.ACCESS_KEY_ID, ConstantVodUtils.ACCESS_KEY_SECRET);
+            //创建获取凭证request和response对象
+            GetVideoPlayAuthRequest request=new GetVideoPlayAuthRequest();
+            //向request设置视频id
+            request.setVideoId(id);
+            GetVideoPlayAuthResponse response = client.getAcsResponse(request);
+            //调用方法得到凭证
+            String playAuth = response.getPlayAuth();
+            System.out.println(playAuth);
+
+            GetPlayInfoRequest getPlayInfoRequest = new GetPlayInfoRequest();
+            getPlayInfoRequest.setVideoId(id);
+            GetPlayInfoResponse responseMp4 = client.getAcsResponse(getPlayInfoRequest);
+            List<GetPlayInfoResponse.PlayInfo> playInfoList = responseMp4.getPlayInfoList();
+            String mp4Url=playInfoList.get(0).getPlayURL();
+            return R.ok().data("mp4Url",mp4Url);
+        } catch (ClientException e) {
+            throw  new GuliException(20001,"获取凭证失败");
+        }
+    }
 
     //上传视频到阿里云
     @PostMapping("uploadAlyiVideo")
