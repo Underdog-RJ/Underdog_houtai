@@ -20,6 +20,7 @@ import com.atguigu.educenter.vo.UcentmentberVo;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
 import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -66,6 +69,22 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     @Autowired
     private EnjoyBlogClient enjoyBlogClient;
 
+    @Override
+    public R getWeather(String location)  {
+
+        try {
+            String url="https://api.seniverse.com/v3/weather/daily.json?key=SFpSV9yPtU8NFwgBl&location=%s";
+
+            String finalUrl=String.format(url,location);
+            String result = HttpClientUtils.get(finalUrl);
+            Gson gson=new Gson();
+            HashMap hashMap = gson.fromJson(result, HashMap.class);
+            return R.ok().data(hashMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     public String login(UcenterMember ucenterMember) {

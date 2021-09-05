@@ -41,6 +41,12 @@ public class UcenterMemberController {
     @Autowired
     private UcenterMemberZhuyeService ucenterMemberZhuyeService;
 
+    @GetMapping("/getWeather")
+    private R getWeather(@RequestParam String location){
+
+        return ucenterMemberService.getWeather(location);
+    }
+
     /**
      * 用户签到
      * @param request

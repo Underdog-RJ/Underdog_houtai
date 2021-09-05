@@ -1,12 +1,17 @@
 package com.atguigu.eduservice.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.entity.EduCourse;
 import com.atguigu.eduservice.entity.EduCourseDescription;
+import com.atguigu.eduservice.entity.EduPub;
+import com.atguigu.eduservice.entity.chapter.ChapterVo;
 import com.atguigu.eduservice.entity.frontvo.CourseFrontVo;
 import com.atguigu.eduservice.entity.vo.CourseInfoVo;
 import com.atguigu.eduservice.entity.vo.CoursePublishVo;
 import com.atguigu.eduservice.entity.frontvo.CourseWebVo;
 import com.atguigu.eduservice.mapper.EduCourseMapper;
+import com.atguigu.eduservice.mapper.EduPubMapper;
 import com.atguigu.eduservice.service.EduChapterService;
 import com.atguigu.eduservice.service.EduCourseDescriptionService;
 import com.atguigu.eduservice.service.EduCourseService;
@@ -23,6 +28,8 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * <p>
@@ -43,6 +50,13 @@ public class EduCourseServiceImpl extends ServiceImpl<EduCourseMapper, EduCourse
 
     @Autowired
     private EduVideoService eduVideoService;
+
+    @Autowired
+    private EduPubMapper eduPubMapper;
+    
+    
+    @Autowired
+    private ThreadPoolExecutor executor;
 
     //添加课程基本信息
     @Override
@@ -110,6 +124,7 @@ public class EduCourseServiceImpl extends ServiceImpl<EduCourseMapper, EduCourse
     @Override
     public CoursePublishVo publishCourseInfo(String id) {
         CoursePublishVo publishCourseInfo = baseMapper.getPublishCourseInfo(id);
+
         return publishCourseInfo;
     }
 
@@ -178,5 +193,28 @@ public class EduCourseServiceImpl extends ServiceImpl<EduCourseMapper, EduCourse
     @Override
     public CourseWebVo getBaseCourseInfo(String courseId) {
         return baseMapper.getBaseCourseInfo(courseId);
+    }
+
+    @Override
+    public R publishCourse(String id) {
+
+        //1.更新课程表的状态为正常
+        CompletableFuture.runAsync(()->{
+            EduCourse eduCourse = new EduCourse();
+            eduCourse.setId(id);
+            eduCourse.setStatus("Normal");//设置课程发布状态
+            baseMapper.updateById(eduCourse);
+        },executor);
+
+        // 查询基本信息
+        CompletableFuture<EduPub> futureBase = CompletableFuture.supplyAsync(() -> eduPubMapper.findBaseInfo(id), executor);
+        CompletableFuture<Void> future = futureBase.thenAcceptAsync((res) -> {
+            List<ChapterVo> chapterVos = eduPubMapper.findChapterInfo(id);
+            String s = JSON.toJSONString(chapterVos);
+            res.setTeachPlan(s);
+            eduPubMapper.insert(res);
+        }, executor);
+
+        return R.ok();
     }
 }

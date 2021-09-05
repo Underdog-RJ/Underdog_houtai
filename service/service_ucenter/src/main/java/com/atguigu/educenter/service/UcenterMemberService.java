@@ -71,4 +71,6 @@ public interface UcenterMemberService extends IService<UcenterMember> {
 
     boolean updateUseruCoinById( Integer count,String id);
 
+    R getWeather(String location);
+
 }

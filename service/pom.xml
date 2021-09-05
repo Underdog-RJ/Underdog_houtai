@@ -13,16 +13,17 @@
     <packaging>pom</packaging>
     <modules>
         <module>service_edu1</module>
-        <module>service_oss</module>
+<!--        <module>service_oss</module>-->
         <module>service_vod</module>
-        <module>service_cms</module>
-        <module>service-msm</module>
+<!--        <module>service_cms</module>-->
+<!--        <module>service-msm</module>-->
         <module>service_ucenter</module>
         <module>service_order</module>
         <module>service_statistics</module>
         <module>service_acl</module>
-        <module>service_chat</module>
-        <module>service-live</module>
+        <module>service_secondkill</module>
+        <!--        <module>service_chat</module>-->
+<!--        <module>service-live</module>-->
     </modules>
     <dependencies>
         <dependency>

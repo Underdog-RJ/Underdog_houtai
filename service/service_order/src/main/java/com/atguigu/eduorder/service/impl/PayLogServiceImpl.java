@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
-import com.atguigu.commonutils.order.CourseWebVoOrder;
-import com.atguigu.commonutils.order.UcenterMemberOrder;
+
+
+import com.atguigu.eduorder.entity.UcenterMemberOrder;
+import com.atguigu.eduorder.entity.CourseWebVoOrder;
 import com.atguigu.eduorder.client.EduClient;
 import com.atguigu.eduorder.client.UcenterClient;
 import com.atguigu.eduorder.entity.Order;

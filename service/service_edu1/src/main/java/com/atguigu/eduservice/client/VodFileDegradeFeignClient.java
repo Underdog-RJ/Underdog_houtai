@@ -2,6 +2,7 @@ package com.atguigu.eduservice.client;
 
 import com.atguigu.commonutils.R;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,5 +19,15 @@ public class VodFileDegradeFeignClient implements VodClient{
     public R deleteBantch(List<String> videoIdList) {
         return R.error().message("删除多个视频出错了");
 
+    }
+
+    @Override
+    public R uploadAlyiVideo(MultipartFile file, String token) {
+        return null;
+    }
+
+    @Override
+    public R getPlayAuth(String id) {
+        return null;
     }
 }

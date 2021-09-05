@@ -4,9 +4,8 @@ package com.atguigu.eduservice.client;
 import com.atguigu.commonutils.R;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,5 +19,15 @@ public interface VodClient {
 
     @DeleteMapping("/eduvod/video/delete-batch")
     public R deleteBantch(@RequestParam("videoIdList") List<String> videoIdList);
+
+
+    //上传视频到阿里云
+    @PostMapping(value = "/eduvod/video/uploadAlyiVideo",consumes = "multipart/form-data")
+    R uploadAlyiVideo(MultipartFile file, @RequestHeader(name = "token", required = true) String token);
+
+
+    //根据视频id获取视频凭证
+    @GetMapping("/eduvod/video/getPlayAuth/{id}")
+    public R getPlayAuth(@PathVariable("id") String id);
 
 }

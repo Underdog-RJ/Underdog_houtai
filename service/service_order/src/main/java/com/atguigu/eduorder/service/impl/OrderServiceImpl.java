@@ -1,10 +1,12 @@
 package com.atguigu.eduorder.service.impl;
 
-import com.atguigu.commonutils.order.CourseWebVoOrder;
-import com.atguigu.commonutils.order.UcenterMemberOrder;
+
+
 import com.atguigu.eduorder.client.EduClient;
 import com.atguigu.eduorder.client.UcenterClient;
+import com.atguigu.eduorder.entity.CourseWebVoOrder;
 import com.atguigu.eduorder.entity.Order;
+import com.atguigu.eduorder.entity.UcenterMemberOrder;
 import com.atguigu.eduorder.entity.vo.OrderQuery;
 import com.atguigu.eduorder.mapper.OrderMapper;
 import com.atguigu.eduorder.service.OrderService;

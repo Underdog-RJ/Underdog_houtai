@@ -26,7 +26,7 @@ public class CodeGenerator {
         // 2、全局配置
         GlobalConfig gc = new GlobalConfig();
         String projectPath = System.getProperty("user.dir");
-        gc.setOutputDir("D:\\projects\\underdog_houtai\\service\\service-live" + "/src/main/java");
+        gc.setOutputDir("F:\\underdog\\underdog_houtai\\service\\service-edu1" + "/src/main/java");
         gc.setAuthor("Zhang zhengxu");
         gc.setOpen(false); //生成后是否打开资源管理器
         gc.setFileOverride(false); //重新生成时文件是否覆盖
@@ -39,7 +39,7 @@ public class CodeGenerator {
 
         // 3、数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:mysql://39.101.196.37/guli?serverTimezone=GMT%2B8");
+        dsc.setUrl("jdbc:mysql://39.101.196.37:6033/guli?serverTimezone=GMT%2B8");
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
         dsc.setUsername("root");
         dsc.setPassword("Zhangzhengxu123.");
@@ -50,7 +50,7 @@ public class CodeGenerator {
         PackageConfig pc = new PackageConfig();
 
         pc.setParent("com.atguigu");
-        pc.setController("com.atguigu.livingservice.controller");
+        pc.setController("com.atguigu.eduservice.controller");
         pc.setEntity("entity");
         pc.setService("service");
         pc.setMapper("mapper");
@@ -58,7 +58,7 @@ public class CodeGenerator {
 
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude("edu_living");
+        strategy.setInclude("edu_pub");
         strategy.setNaming(NamingStrategy.underline_to_camel);//数据库表映射到实体的命名策略
         strategy.setTablePrefix(pc.getModuleName() + "_"); //生成实体时去掉表前缀
 

@@ -5,19 +5,21 @@ import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
+import com.atguigu.eduservice.mapper.EduBlogMapper;
 import com.atguigu.eduservice.service.EduBlogService;
-import com.atguigu.eduservice.service.impl.EduBlogServiceImpl;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.additional.query.impl.LambdaQueryChainWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -34,6 +36,12 @@ public class EduBlogController {
 
     @Autowired
     private EduBlogService eduBlogService;
+
+    @Autowired
+    private EduBlogMapper eduBlogMapper;
+
+    @Autowired
+    EduSubjectController eduSubjectController;
 
     @GetMapping("{id}")
     public R getBlogById(@PathVariable String id){
@@ -100,6 +108,21 @@ public class EduBlogController {
         }else {
             return R.error();
         }
+    }
+
+    @GetMapping("test")
+    public R test(){
+
+        List<EduBlog> list = eduBlogService.list(null);
+        List<String> collect = list.stream().map(EduBlog::getAuthorNickname).collect(Collectors.toList());
+        QueryWrapper<EduBlog> wrapper=new QueryWrapper<>();
+        Map<String, Object> data = eduSubjectController.getAllSubject().getData();
+
+//        List<EduBlog> java = new LambdaQueryChainWrapper<>(eduBlogMapper).like(EduBlog::getContent, "java").in("").list();
+
+        Map<String,List<EduBlog>> map =list.stream().collect(Collectors.groupingBy(item->item.getSubjectId()));
+        System.out.println(map);
+        return R.ok();
     }
 
 

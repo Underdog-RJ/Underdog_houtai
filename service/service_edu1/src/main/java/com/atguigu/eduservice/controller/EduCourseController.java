@@ -91,18 +91,14 @@ public class EduCourseController {
     public R getPublishCourseInfo(@PathVariable String id) {
         CoursePublishVo coursePublishVo=courseService.publishCourseInfo(id);
         return R.ok().data("publishCourse",coursePublishVo);
-
     }
+
     //课程最终发布
     //修该课程状态
     @PostMapping("publishCourse/{id}")
     public R publishCourse(@PathVariable String id)
     {
-        EduCourse eduCourse = new EduCourse();
-        eduCourse.setId(id);
-        eduCourse.setStatus("Normal");//设置课程发布状态
-        courseService.updateById(eduCourse);
-        return R.ok();
+        return courseService.publishCourse(id);
     }
 
     //删除课程

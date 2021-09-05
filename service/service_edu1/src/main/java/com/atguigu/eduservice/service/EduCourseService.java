@@ -1,5 +1,6 @@
 package com.atguigu.eduservice.service;
 
+import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.entity.EduCourse;
 import com.atguigu.eduservice.entity.frontvo.CourseFrontVo;
 import com.atguigu.eduservice.entity.vo.CourseInfoVo;
@@ -35,4 +36,6 @@ public interface EduCourseService extends IService<EduCourse> {
     Map<String, Object> getCourseFrontList(Page<EduCourse> pageCourse, CourseFrontVo courseFrontVo);
 
     CourseWebVo getBaseCourseInfo(String courseId);
+
+    R publishCourse(String id);
 }

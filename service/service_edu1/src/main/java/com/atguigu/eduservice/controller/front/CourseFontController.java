@@ -22,6 +22,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @RestController
 @RequestMapping("/eduservice/coursefront")
@@ -35,6 +38,9 @@ public class CourseFontController {
 
     @Autowired
     private OrdersClient ordersClient;
+
+    @Autowired
+    private ThreadPoolExecutor executor;
 
     //1 条件查询带分页查询课程
     @PostMapping("getFrontCourseList/{page}/{limit}")
@@ -55,30 +61,45 @@ public class CourseFontController {
 
     //2课程详情的方法
     @GetMapping("getFrontCourseInfo/{courseId}")
-    public R getFrontCourseInfo(@PathVariable String courseId, HttpServletRequest request){
-        //根据课程id，编写sql语句查询课程信息
-        CourseWebVo courseWebVo=eduCourseService.getBaseCourseInfo(courseId);
-
-        courseWebVo.setViewCount(courseWebVo.getViewCount()+1);
-
-        EduCourse eduCourse=new EduCourse();
-        BeanUtils.copyProperties(courseWebVo,eduCourse);
-        eduCourseService.updateById(eduCourse);
+    public R getFrontCourseInfo(@PathVariable String courseId, HttpServletRequest request) throws ExecutionException, InterruptedException {
 
 
-        //根据课程Id查询章节和小节
-        List<ChapterVo> chapterVideoList = eduChapterService.getChapterVideoByCourseId(courseId);
-        Cookie[] cookies = request.getCookies();
-        String token = request.getHeader("token");
+        CompletableFuture<CourseWebVo> futureCouseWebVo = CompletableFuture.supplyAsync(() -> {
+            //1.根据课程id，编写sql语句查询课程信息
+            CourseWebVo courseWebVo = eduCourseService.getBaseCourseInfo(courseId);
+            return courseWebVo;
+        }, executor);
 
-        //根据课程id和用户id查询当前课程是否已经支付过了
-        String memberId = JwtUtils.getMemberIdByJwtToken(request);
-        if(StringUtils.isEmpty(memberId))
-        {
-            return R.ok().code(28004);
-        }
-        boolean buyCourse = ordersClient.isBuyCourse(courseId,memberId);
-        return R.ok().data("courseWebVo",courseWebVo).data("chapterVideoList",chapterVideoList).data("isBuy",buyCourse);
+        //等待futureCouseWebVo完成之后在执行
+        CompletableFuture<Void> futureUpdate = futureCouseWebVo.thenAcceptAsync((res) -> {
+            //2.更新浏览量
+            res.setViewCount(res.getViewCount() + 1);
+            EduCourse eduCourse = new EduCourse();
+            BeanUtils.copyProperties(res, eduCourse);
+            eduCourseService.updateById(eduCourse);
+        }, executor);
+
+
+        CompletableFuture<List<ChapterVo>> futureChapterVideoList = CompletableFuture.supplyAsync(() -> {
+            //3.根据课程Id查询章节和小节
+            List<ChapterVo> chapterVideoList = eduChapterService.getChapterVideoByCourseId(courseId);
+            return chapterVideoList;
+        }, executor);
+
+        CompletableFuture<Object> futureBuyCouse = CompletableFuture.supplyAsync(() -> {
+            //4.根据课程id和用户id查询当前课程是否已经支付过了
+            String memberId = JwtUtils.getMemberIdByJwtToken(request);
+            if (StringUtils.isEmpty(memberId)) {
+                return R.ok().code(28004);
+            }
+            boolean buyCourse = ordersClient.isBuyCourse(courseId, memberId);
+            return buyCourse;
+        }, executor);
+
+        CompletableFuture.allOf(futureUpdate,futureChapterVideoList,futureBuyCouse).get();
+
+
+        return R.ok().data("courseWebVo",futureCouseWebVo.get()).data("chapterVideoList",futureChapterVideoList.get()).data("isBuy",futureBuyCouse.get());
     }
 
     //根据课程id查询课程信息

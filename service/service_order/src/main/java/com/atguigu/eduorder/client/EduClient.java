@@ -1,6 +1,7 @@
 package com.atguigu.eduorder.client;
 
-import com.atguigu.commonutils.order.CourseWebVoOrder;
+
+import com.atguigu.eduorder.entity.CourseWebVoOrder;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
