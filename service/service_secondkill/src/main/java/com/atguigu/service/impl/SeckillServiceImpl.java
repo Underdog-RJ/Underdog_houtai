@@ -85,15 +85,15 @@ public class SeckillServiceImpl implements SeckillService {
         // 缓存商品
         SeckillRedisTo redisTo = new SeckillRedisTo();
         //1.sku的基本信息
-     /*   R courseInfoResult = eduFeignService.getCourseInfo(seckillSkuRelation.getSkuId());
+        R courseInfoResult = eduFeignService.getCourseInfo(seckillSkuRelation.getSkuId());
 
         if(Objects.equals(20000,courseInfoResult.getCode())){
           Map<String, Object> data = courseInfoResult.getData();
           if(data.containsKey("courseInfoVo")){
-            SkuInfoVo courseInfoVo = JSON.parseObject((String) data.get("courseInfoVo"), new TypeReference<SkuInfoVo>() {});
+            SkuInfoVo courseInfoVo = JSON.parseObject(JSON.toJSONString(data.get("courseInfoVo")), new TypeReference<SkuInfoVo>() {});
             redisTo.setSkuInfoVo(courseInfoVo);
           }
-        }*/
+        }
         //2.sku的秒杀信息
         BeanUtils.copyProperties(seckillSkuRelation,redisTo);
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.eduservice.mapper.EduPubMapper">
+
+    <resultMap id="eduChapterMap" type="com.atguigu.eduservice.entity.chapter.ChapterVo">
+        <id property="id" column="id"></id>
+        <result property="title" column="title"></result>
+        <collection property="children" ofType="com.atguigu.eduservice.entity.chapter.VideoVo">
+            <id column="vid" property="id"></id>
+            <result column="vtitle" property="title"></result>
+        </collection>
+    </resultMap>
+
+    <select id="findBaseInfo" resultType="com.atguigu.eduservice.entity.EduPub">
+        SELECT
+            ec.id,
+            ec.title,
+            ec.price,
+            ec.lesson_num,
+            ec.cover,
+            edc.description,
+            et.`name` as teacherName,
+            esp.title as subjuctLevel1Name,
+            ess.title as subjectLevel2Name
+        FROM
+            edu_course ec
+                INNER JOIN edu_teacher et ON ec.teacher_id = et.id
+                INNER JOIN edu_subject esp on ec.subject_parent_id=esp.id
+                INNER JOIN edu_subject ess on ec.subject_id=ess.id
+                INNER JOIN edu_course_description edc on ec.id=edc.id
+        WHERE ec.id=#{id}
+    </select>
+
+    <select id="findChapterInfo" resultMap="eduChapterMap">
+        SELECT
+            ec.id as id,
+            ec.title as title,
+            ev.id as vid,
+            ev.title as vtitle
+        FROM
+            edu_chapter ec
+                INNER JOIN edu_video ev ON ec.id = ev.chapter_id
+        WHERE
+            ec.course_id = #{id}
+    </select>
+
+</mapper>
