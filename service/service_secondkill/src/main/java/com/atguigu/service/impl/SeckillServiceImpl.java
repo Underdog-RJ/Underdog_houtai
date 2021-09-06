@@ -42,7 +42,7 @@ public class SeckillServiceImpl implements SeckillService {
 
   private final String SKUKILL_CACHE_PREFIX= "seckill:skus";
 
-  private final String SKU_STOCK_SEMAPHORE="seckill:stock"; // 商品随机码
+  private final String SKU_STOCK_SEMAPHORE="seckill:stock:"; // 商品随机码
 
 
 
@@ -70,50 +70,57 @@ public class SeckillServiceImpl implements SeckillService {
       Long startTime = TimeUtil.timeStrWithPattern2Long(session.getStartTime());
       Long endTime = TimeUtil.timeStrWithPattern2Long(session.getEndTime());
       String key= SESSIONS_CACHE_PREFIX +startTime+"_"+ endTime;
-      List<String> collect = session.getRelationSkus().stream().map(item -> item.getSkuId()).collect(Collectors.toList());
-      //缓存活动信息
-      redisTemplate.opsForList().leftPushAll(key,collect);
+      Boolean hasKey = redisTemplate.hasKey(key);
+      if(!hasKey){
+        //缓存活动信息
+        List<String> collect = session.getRelationSkus().stream().map(item -> item.getPromotionSessionId() + "_" + item.getSkuId()).collect(Collectors.toList());
+        redisTemplate.opsForList().leftPushAll(key,collect);
+      }
     }));
   }
 
   private void saveSessionSkuInfos(Flux<SeckillSession> sessions){
 
-
     sessions.toIterable().forEach((session->{
       BoundHashOperations<String, Object, Object> ops = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
       session.getRelationSkus().stream().forEach(seckillSkuRelation -> {
-        // 缓存商品
-        SeckillRedisTo redisTo = new SeckillRedisTo();
-        //1.sku的基本信息
-        R courseInfoResult = eduFeignService.getCourseInfo(seckillSkuRelation.getSkuId());
 
-        if(Objects.equals(20000,courseInfoResult.getCode())){
-          Map<String, Object> data = courseInfoResult.getData();
-          if(data.containsKey("courseInfoVo")){
-            SkuInfoVo courseInfoVo = JSON.parseObject(JSON.toJSONString(data.get("courseInfoVo")), new TypeReference<SkuInfoVo>() {});
-            redisTo.setSkuInfoVo(courseInfoVo);
-          }
-        }
-        //2.sku的秒杀信息
-        BeanUtils.copyProperties(seckillSkuRelation,redisTo);
-
-        //3. 设置当前商品的秒杀时间信息
-        redisTo.setStartTime(TimeUtil.timeStrWithPattern2Long(session.getStartTime()));
-        redisTo.setEndTime(TimeUtil.timeStrWithPattern2Long(session.getEndTime()));
-
-        // 4. 设置随机码
         String token = UUID.randomUUID().toString().replace("-", "");
-        redisTo.setRandomCode(token);
 
-        // 使用可以秒杀的个数作为分布式的信号量  限流
-        RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + token);
+        if(!ops.hasKey(seckillSkuRelation.getPromotionSessionId()+"_"+seckillSkuRelation.getSkuId())){
 
-        // 商品可以秒杀的数量最为信号量
-        semaphore.trySetPermits(seckillSkuRelation.getSeckillCount());
+          // 缓存商品
+          SeckillRedisTo redisTo = new SeckillRedisTo();
+          //1.sku的基本信息
+          R courseInfoResult = eduFeignService.getCourseInfo(seckillSkuRelation.getSkuId());
 
-        String jsonString = JSON.toJSONString(redisTo);
+          if(Objects.equals(20000,courseInfoResult.getCode())){
+            Map<String, Object> data = courseInfoResult.getData();
+            if(data.containsKey("courseInfoVo")){
+              SkuInfoVo courseInfoVo = JSON.parseObject(JSON.toJSONString(data.get("courseInfoVo")), new TypeReference<SkuInfoVo>() {});
+              redisTo.setSkuInfoVo(courseInfoVo);
+            }
+          }
+          //2.sku的秒杀信息
+          BeanUtils.copyProperties(seckillSkuRelation,redisTo);
 
-        ops.put(seckillSkuRelation.getSkuId(),jsonString);
+          //3. 设置当前商品的秒杀时间信息
+          redisTo.setStartTime(TimeUtil.timeStrWithPattern2Long(session.getStartTime()));
+          redisTo.setEndTime(TimeUtil.timeStrWithPattern2Long(session.getEndTime()));
+          // 4. 设置随机码
+          redisTo.setRandomCode(token);
+
+          // 5. 存入redis中
+          String jsonString = JSON.toJSONString(redisTo);
+          ops.put(seckillSkuRelation.getPromotionSessionId() + "_" +  seckillSkuRelation.getSkuId(),jsonString);
+
+          //6. 上架库存信息
+          // 使用可以秒杀的个数作为分布式的信号量  限流
+          RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE + token);
+          // 商品可以秒杀的数量最为信号量
+          semaphore.trySetPermits(seckillSkuRelation.getSeckillCount());
+        }
+
       });
     }));
 
