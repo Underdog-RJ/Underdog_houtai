@@ -1,13 +1,17 @@
 package com.atguigu.eduservice.controller.front;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.commonutils.order.CourseWebVoOrder;
 import com.atguigu.eduservice.client.OrdersClient;
+import com.atguigu.eduservice.client.SeckillClient;
 import com.atguigu.eduservice.entity.EduCourse;
 import com.atguigu.eduservice.entity.chapter.ChapterVo;
 import com.atguigu.eduservice.entity.frontvo.CourseFrontVo;
 import com.atguigu.eduservice.entity.frontvo.CourseWebVo;
+import com.atguigu.eduservice.entity.to.SeckillRedisTo;
 import com.atguigu.eduservice.service.EduChapterService;
 import com.atguigu.eduservice.service.EduCourseService;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
@@ -41,6 +45,9 @@ public class CourseFontController {
 
     @Autowired
     private ThreadPoolExecutor executor;
+
+    @Autowired
+    private SeckillClient seckillClient;
 
     //1 条件查询带分页查询课程
     @PostMapping("getFrontCourseList/{page}/{limit}")
@@ -96,10 +103,23 @@ public class CourseFontController {
             return buyCourse;
         }, executor);
 
-        CompletableFuture.allOf(futureUpdate,futureChapterVideoList,futureBuyCouse).get();
+        // 查询当前商品是否参与秒杀
+
+      CompletableFuture<SeckillRedisTo> isPromote = CompletableFuture.supplyAsync(() -> {
+        R result = seckillClient.getSkuSeckillInfo(courseId);
+        SeckillRedisTo edu = null;
+        if (result.getCode() == 20000) {
+          edu = JSON.parseObject(JSON.toJSONString(result.getData().get("edu")), new TypeReference<SeckillRedisTo>() {
+          });
+        }
+        return edu;
+      }, executor);
 
 
-        return R.ok().data("courseWebVo",futureCouseWebVo.get()).data("chapterVideoList",futureChapterVideoList.get()).data("isBuy",futureBuyCouse.get());
+      CompletableFuture.allOf(futureUpdate,futureChapterVideoList,futureBuyCouse,isPromote).get();
+
+
+      return R.ok().data("courseWebVo",futureCouseWebVo.get()).data("chapterVideoList",futureChapterVideoList.get()).data("isBuy",futureBuyCouse.get()).data("isPromote",isPromote);
     }
 
     //根据课程id查询课程信息

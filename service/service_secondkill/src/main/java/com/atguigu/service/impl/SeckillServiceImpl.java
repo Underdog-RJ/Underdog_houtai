@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.atguigu.commonutils.R;
 import com.atguigu.commonutils.TimeUtil;
 import com.atguigu.entity.SeckillSession;
+import com.atguigu.entity.SeckillSkuRelation;
 import com.atguigu.entity.to.SeckillRedisTo;
 import com.atguigu.entity.vo.SkuInfoVo;
 import com.atguigu.feign.EduFeignService;
@@ -17,12 +18,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,5 +126,68 @@ public class SeckillServiceImpl implements SeckillService {
     }));
 
 
+  }
+
+    /**
+     * 当前可以参与秒杀的商品信息
+     * @return
+     */
+    @Override
+    public Mono<R> getCurrentSeckillSkus() {
+
+      //1.去欸的那个当前时间水域那个秒杀场次
+      long now = new Date().getTime()/1000;
+      Set<String> keys = redisTemplate.keys(SESSIONS_CACHE_PREFIX + "*");
+      for (String key : keys) {
+        String replace = key.replace(SESSIONS_CACHE_PREFIX, "");
+        String[] s = replace.split("_");
+        long startTime = Long.parseLong(s[0]);
+        long endTime = Long.parseLong(s[1]);
+        if(now>=startTime&&now<=endTime){
+          List<String> range = redisTemplate.opsForList().range(key, 0, -1);
+          BoundHashOperations<String, String, Object> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+          List<Object> objects = hashOps.multiGet(range);
+          if(!CollectionUtils.isEmpty(objects)){
+            List<SeckillRedisTo> collect = objects.stream().map(item -> {
+              SeckillRedisTo redisTo = JSON.parseObject(item.toString(), SeckillRedisTo.class);
+              redisTo.setRandomCode(null); // 当前秒杀开始就需要随机码
+              return redisTo;
+            }).collect(Collectors.toList());
+            return Mono.just(R.ok().data("list",collect));
+          }
+          break;
+        }
+      }
+
+      return Mono.empty();
+    }
+
+
+  @Override
+  public R getSkuSeckillInfo(String id) {
+    //1.找到所有需要参与秒杀的商品的key
+    BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+
+    Set<String> keys = hashOps.keys();
+    if(!CollectionUtils.isEmpty(keys)){
+      // 定义正则
+//      String regx="\\d"+id;
+      for (String key : keys) {
+        String[] s = key.split("_");
+        if(Objects.equals(s[1],id)){
+          String json = hashOps.get(key);
+          SeckillRedisTo seckillRedisTo = JSON.parseObject(json, SeckillRedisTo.class);
+          // 处理随机码
+          long now = new Date().getTime() / 1000;
+          if(now>=seckillRedisTo.getStartTime()&&now<=seckillRedisTo.getEndTime()){
+          }else {
+            seckillRedisTo.setRandomCode(null);
+          }
+          return R.ok().data("edu",seckillRedisTo);
+        }
+      }
+    }
+
+    return null;
   }
 }
