@@ -7,12 +7,15 @@ import com.atguigu.eduservice.entity.excel.SubjectData;
 import com.atguigu.eduservice.service.EduSubjectService;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 public class SubjectExcelListener extends AnalysisEventListener<SubjectData> {
 
     //因为SubjectListener不能交给spring进行管理,需要自己new不能注入其他对象
     //不能实现数据库操作
     public EduSubjectService subjectService;
+
 
     public SubjectExcelListener() {
     }
@@ -50,6 +53,7 @@ public class SubjectExcelListener extends AnalysisEventListener<SubjectData> {
             existTwoSubject.setTitle(subjectData.getTwoSubjectName());
             subjectService.save(existTwoSubject);
         }
+
 
     }
 

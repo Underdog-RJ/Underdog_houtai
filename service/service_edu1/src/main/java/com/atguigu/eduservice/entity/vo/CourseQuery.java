@@ -9,4 +9,5 @@ public class CourseQuery {
     private String title;
     @ApiModelProperty(value = "课程状态 Draft未发布  Normal已发布")
     private String status;
+    private String subjectParentId;
 }

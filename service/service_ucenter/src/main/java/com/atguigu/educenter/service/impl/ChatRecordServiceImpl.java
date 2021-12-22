@@ -32,8 +32,6 @@ public class ChatRecordServiceImpl implements ChatRecordService {
 
     private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
-
-
     /**
      * 将用户发送给朋友的聊天记录保存到数据库中
      * @param chatRecord

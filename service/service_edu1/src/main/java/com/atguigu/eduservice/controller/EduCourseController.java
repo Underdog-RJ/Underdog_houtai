@@ -44,11 +44,16 @@ public class EduCourseController {
 
         String status = courseQuery.getStatus();
         String title = courseQuery.getTitle();
+        String subjectId = courseQuery.getSubjectParentId();
+
         if(!StringUtils.isEmpty(status)){
             wrapper.eq("status",status);
         }
         if(!StringUtils.isEmpty(title)){
             wrapper.like("title",title);
+        }
+        if(!StringUtils.isEmpty(subjectId)){
+            wrapper.like("subject_parent_id",subjectId);
         }
         //排序
         wrapper.orderByDesc("gmt_create");

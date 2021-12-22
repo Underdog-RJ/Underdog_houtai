@@ -53,13 +53,13 @@ public class CourseFontController {
     @PostMapping("getFrontCourseList/{page}/{limit}")
     public R getFrontCourseList(@PathVariable long page,
                                 @PathVariable long limit,
-                                @RequestBody(required = false)CourseFrontVo courseFrontVo,
-                                HttpServletRequest request){
+                                @RequestBody(required = false) CourseFrontVo courseFrontVo,
+                                HttpServletRequest request) {
 
         String token = request.getHeader("token");
-        Page<EduCourse> pageCourse=new Page<>(page,limit);
+        Page<EduCourse> pageCourse = new Page<>(page, limit);
 
-        Map<String,Object> map= eduCourseService.getCourseFrontList(pageCourse,courseFrontVo);
+        Map<String, Object> map = eduCourseService.getCourseFrontList(pageCourse, courseFrontVo);
 
         //返回分页所有数据
         return R.ok().data(map);
@@ -105,39 +105,37 @@ public class CourseFontController {
 
         // 查询当前商品是否参与秒杀
 
-      CompletableFuture<SeckillRedisTo> isPromote = CompletableFuture.supplyAsync(() -> {
-        R result = seckillClient.getSkuSeckillInfo(courseId);
-        SeckillRedisTo edu = null;
-        if (result.getCode() == 20000) {
-          edu = JSON.parseObject(JSON.toJSONString(result.getData().get("edu")), new TypeReference<SeckillRedisTo>() {
-          });
-        }
-        return edu;
-      }, executor);
+        CompletableFuture<SeckillRedisTo> isPromote = CompletableFuture.supplyAsync(() -> {
+            R result = seckillClient.getSkuSeckillInfo(courseId);
+            SeckillRedisTo edu = null;
+            if (result.getCode() == 20000) {
+                edu = JSON.parseObject(JSON.toJSONString(result.getData().get("edu")), new TypeReference<SeckillRedisTo>() {
+                });
+            }
+            return edu;
+        }, executor);
 
 
-      CompletableFuture.allOf(futureUpdate,futureChapterVideoList,futureBuyCouse,isPromote).get();
+        CompletableFuture.allOf(futureUpdate, futureChapterVideoList, futureBuyCouse, isPromote).get();
 
 
-      return R.ok().data("courseWebVo",futureCouseWebVo.get()).data("chapterVideoList",futureChapterVideoList.get()).data("isBuy",futureBuyCouse.get()).data("isPromote",isPromote);
+        return R.ok().data("courseWebVo", futureCouseWebVo.get()).data("chapterVideoList", futureChapterVideoList.get()).data("isBuy", futureBuyCouse.get()).data("isPromote", isPromote);
     }
 
     //根据课程id查询课程信息
     @PostMapping("getCourseInfoOrder/{id}")
-    public CourseWebVoOrder getCourseInfoOrder(@PathVariable String id)
-    {
+    public CourseWebVoOrder getCourseInfoOrder(@PathVariable String id) {
         CourseWebVo courseInfo = eduCourseService.getBaseCourseInfo(id);
         CourseWebVoOrder courseWebVoOrder = new CourseWebVoOrder();
-        BeanUtils.copyProperties(courseInfo,courseWebVoOrder);
+        BeanUtils.copyProperties(courseInfo, courseWebVoOrder);
         return courseWebVoOrder;
     }
 
     //根据课程Id更新课程的购买数量
     @GetMapping("updateBuyCount/{id}")
-    public void updateBuyCount(@PathVariable String id)
-    {
+    public void updateBuyCount(@PathVariable String id) {
         EduCourse byId = eduCourseService.getById(id);
-        byId.setBuyCount(byId.getBuyCount()+1);
+        byId.setBuyCount(byId.getBuyCount() + 1);
         eduCourseService.updateById(byId);
     }
 

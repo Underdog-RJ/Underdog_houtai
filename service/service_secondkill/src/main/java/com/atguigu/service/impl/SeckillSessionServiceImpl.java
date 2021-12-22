@@ -7,10 +7,11 @@ import com.atguigu.repository.SeckillSkuRelationRepository;
 import com.atguigu.service.SeckillSessionService;
 
 import com.atguigu.servicebase.exception.BizCodeEnume;
-import org.apache.commons.collections4.CollectionUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

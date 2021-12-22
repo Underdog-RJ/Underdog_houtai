@@ -3,11 +3,12 @@ package com.atguigu.controller;
 import com.atguigu.commonutils.R;
 import com.atguigu.service.SeckillService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
+
+import javax.servlet.http.HttpServletRequest;
+
 
 @RestController
 @RequestMapping("seckill/sec")
@@ -31,5 +32,21 @@ public class SeckillController {
     return seckillService.getSkuSeckillInfo(id);
 
   }
+
+  /**
+   * 参与秒杀
+   */
+  @GetMapping("/kill")
+  public Mono<R> secKill(@RequestParam("killId") String killId,
+                         @RequestParam("key") String key,
+                         @RequestParam("num") Integer num,
+                         HttpServletRequest request){
+
+   String orderId= seckillService.kill(killId,key,num,request);
+   return Mono.just(R.ok().data("orderId",orderId));
+  }
+
+
+
 
 }

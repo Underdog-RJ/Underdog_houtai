@@ -24,6 +24,7 @@
 
     <artifactId>service_vod</artifactId>
     <dependencies>
+
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-sdk-vod-upload</artifactId>

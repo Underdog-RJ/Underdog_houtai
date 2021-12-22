@@ -85,8 +85,16 @@ public class JwtUtils {
         return (String)claims.get("id");
     }
 
+    public static String getMemberIdFromToken(String token){
+
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(token);
+
+        Claims claims = claimsJws.getBody();
+        return  claims.get("id").toString();
+    }
+
     public static Map<String,String> getUserIdByJwtToken(HttpServletRequest request) {
-         String jwtToken = request.getHeader("token");
+        String jwtToken = request.getHeader("token");
 
         if(StringUtils.isEmpty(jwtToken)) return null;
         Jws<Claims> claimsJws = Jwts.parser().setSigningKey(APP_SECRET).parseClaimsJws(jwtToken);

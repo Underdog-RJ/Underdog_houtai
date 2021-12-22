@@ -73,15 +73,11 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         }
         //排序
         wrapper.orderByDesc("gmt_create");
-
         Map<String, String> map = JwtUtils.getUserIdByJwtToken(request);
         if(!Objects.equals(map.get("nickname"),"admin")){
             wrapper.eq("author_id",map.get("id"));
         }
-
         return eduBlogMapper.selectPage(blogPage,wrapper);
-
-
     }
 
 

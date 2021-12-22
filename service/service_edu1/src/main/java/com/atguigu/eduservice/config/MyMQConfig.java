@@ -36,7 +36,6 @@ public class MyMQConfig {
     @Bean
     public Exchange orderEventExchange(){
         return new TopicExchange("living-event-exchange",true,false);
-
     }
 
     @Bean

@@ -561,7 +561,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
     /**
      * 获取当月连续签到次数
-     *
+     *m
      * @param uid  用户ID
      * @param date 日期
      * @return 当月连续签到次数
@@ -571,13 +571,11 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         int max=0;
         String type = String.format("u%d", date.getDayOfMonth());
         List<Long> list = bitfield(buildSignKey(uid, date), date.getDayOfMonth(),0);
+        List<Integer> days =new ArrayList<>();
         if (list != null && list.size() > 0) {
             // 取低位连续不为0的个数即为连续签到次数，需考虑当天尚未签到的情况
             long v = list.get(0) == null ? 0 : list.get(0);
             for (int i = 0; i < date.getDayOfMonth(); i++) {
-                System.out.println(v>>1);
-                System.out.println(v<<1);
-                System.out.println(v>>1<<1);
                 if (v >> 1 << 1 == v) {
                     // 低位为0且非当天说明连续签到中断了
                     if (i > 0){
@@ -587,6 +585,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
                         }
                     }
                 } else {
+                    days.add(i);
                     signCount += 1;
                 }
                 v >>= 1;
@@ -631,7 +630,6 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
      */
     public boolean doSign(String uid, LocalDate date) {
         int offset = date.getDayOfMonth() - 1;
-
         return redisTemplate.opsForValue().setBit(buildSignKey(uid, date), offset, true);
     }
 

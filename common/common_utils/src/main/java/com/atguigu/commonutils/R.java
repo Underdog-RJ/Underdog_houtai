@@ -1,6 +1,8 @@
 package com.atguigu.commonutils;
 
 
+
+import com.atguigu.commonutils.ResutCode;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

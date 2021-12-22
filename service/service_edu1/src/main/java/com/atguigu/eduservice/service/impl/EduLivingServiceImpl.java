@@ -57,7 +57,6 @@ public class EduLivingServiceImpl extends ServiceImpl<EduLivingMapper, EduLiving
     @Override
     public R addLive( Map<String, String> teacherInfo, EduLiving eduLiving) {
 
-
         String teacherId = teacherInfo.get("id");
 
         String eduLivingJson = redisTemplate.opsForValue().get(teacherId);

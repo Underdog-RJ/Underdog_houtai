@@ -89,6 +89,7 @@ public class EduSubjectServiceImpl extends ServiceImpl<EduSubjectMapper, EduSubj
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+
     @Override
     public void addSubject(MultipartFile file, EduSubjectService subjectService) {
         try {
@@ -96,6 +97,7 @@ public class EduSubjectServiceImpl extends ServiceImpl<EduSubjectMapper, EduSubj
             InputStream in = file.getInputStream();
             //调用方法进行读取
             EasyExcel.read(in, SubjectData.class, new SubjectExcelListener(subjectService)).sheet().doRead();
+            redisTemplate.delete("catelogJSON");
         } catch (Exception e) {
 
         }
@@ -109,7 +111,6 @@ public class EduSubjectServiceImpl extends ServiceImpl<EduSubjectMapper, EduSubj
         if (StringUtils.isEmpty(catelogJSON)) {
             //缓存中没有，查询数据库
             List<OneSubject> allOneTwoSubjectFromBb = getAllOneTwoSubjectFromBbWithRedisLock();
-
             return allOneTwoSubjectFromBb;
         }
         //如果为复杂类型，可以使用TypeReference来转换

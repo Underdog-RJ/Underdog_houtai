@@ -347,7 +347,6 @@ public class PermissionServiceImpl extends ServiceImpl<PermissionMapper, Permiss
                 //如果children进行初始化操作
                if(permissionNode.getChildren()==null){
                     permissionNode.setChildren(new ArrayList<Permission>());
-
                 }
                 //把查询出来的子菜单放到夫菜单里面
                 permissionNode.getChildren().add(selectChildrenUnderdogEdu(it,permissionList));

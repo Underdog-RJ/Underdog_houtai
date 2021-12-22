@@ -30,6 +30,27 @@ public class TimeUtil {
 
     static String YMD = "yyyy-MM-dd";
 
+    public static void main(String[] args) {
+        peridTest();
+    }
+
+    public static String durationTest() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime next = now.plusDays(1);
+        Duration of = Duration.between(now, next);
+        long seconds = of.getSeconds();
+        System.out.println(seconds);
+        return seconds + "";
+    }
+
+    public static void peridTest() {
+        LocalDate now = LocalDate.now();
+        LocalDate plus = now.plusDays(1);
+        Period between = Period.between(now, plus);
+        System.out.println(between.getMonths());
+    }
+
+
     public static String formatTime(LocalDateTime time) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String createTime = dateTimeFormatter.format(time);
@@ -330,11 +351,10 @@ public class TimeUtil {
         return null;
     }
 
-  public static Long timeStrWithPattern2Long(String time)  {
-    DateTimeFormatter df = DateTimeFormatter.ofPattern(YMDHMS);
-    return LocalDateTime.parse(time,df).toEpochSecond(ZoneOffset.of("+8"));
-  }
-
+    public static Long timeStrWithPattern2Long(String time) {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(YMDHMS);
+        return LocalDateTime.parse(time, df).toEpochSecond(ZoneOffset.of("+8"));
+    }
 
 
     /**
@@ -347,8 +367,6 @@ public class TimeUtil {
         if ("00:00.00".equals(time)) {
             return 0L;
         }
-
-//        System.out.println(time);
         try {
             long hour = Long.valueOf(time.substring(0, time.indexOf(":")));
             long min = Long.valueOf(time.substring(time.indexOf(":") + 1, time.indexOf(".")));

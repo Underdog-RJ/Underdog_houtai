@@ -76,6 +76,7 @@ public class LivingHandler extends SimpleChannelInboundHandler<TextWebSocketFram
                         channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(message)));
                     }
                 }
+                break;
 
         }
     }

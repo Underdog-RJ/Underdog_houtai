@@ -2,8 +2,10 @@ package com.atguigu.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.commonutils.TimeUtil;
+import com.atguigu.commonutils.order.SeckillQuickOrderTo;
 import com.atguigu.entity.SeckillSession;
 import com.atguigu.entity.SeckillSkuRelation;
 import com.atguigu.entity.to.SeckillRedisTo;
@@ -11,21 +13,30 @@ import com.atguigu.entity.vo.SkuInfoVo;
 import com.atguigu.feign.EduFeignService;
 import com.atguigu.service.SeckillService;
 import com.atguigu.service.SeckillSessionService;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class SeckillServiceImpl implements SeckillService {
 
@@ -37,6 +48,11 @@ public class SeckillServiceImpl implements SeckillService {
 
   @Autowired
   RedissonClient redissonClient;
+
+
+
+  @Autowired
+  RabbitTemplate rabbitTemplate;
 
 
   private final String SESSIONS_CACHE_PREFIX ="seckill:sessions:";
@@ -188,6 +204,84 @@ public class SeckillServiceImpl implements SeckillService {
       }
     }
 
+    return null;
+  }
+
+
+  @Override
+  public String kill(String killId, String key, Integer num, HttpServletRequest request) {
+//    ServerRequest.Headers headers = request.headers();
+    String token = request.getHeader("token");
+//    String token=headers.header("token").get(0);
+    if(StringUtils.isEmpty(token)){
+      return null;
+    }
+    BoundHashOperations<String, String, String> hashOps = redisTemplate.boundHashOps(SKUKILL_CACHE_PREFIX);
+    String skuInfoJson = hashOps.get(killId);
+    if(StringUtils.isEmpty(skuInfoJson)){
+      return null;
+    }else {
+      // 合法性校验
+      SeckillRedisTo seckillRedisTo = JSON.parseObject(skuInfoJson, SeckillRedisTo.class);
+      Long startTime = seckillRedisTo.getStartTime();
+      Long endTime = seckillRedisTo.getEndTime();
+      Long now=new Date().getTime()/1000;
+      long ttl=(startTime-endTime)*1000;
+      //1.校验时间合法性
+      if(now>=startTime&&now<=endTime){
+          //2.校验随机码和商品Id
+        String randomCode = seckillRedisTo.getRandomCode();
+        String skuIdFromRedis=seckillRedisTo.getPromotionSessionId()+seckillRedisTo.getSkuId();
+        if(Objects.equals(randomCode,key)&&Objects.equals(skuIdFromRedis,killId)){
+            //3.验证购买数量是否合理
+            if(num<seckillRedisTo.getSeckillLimit()){
+              //4.验证这个人是否已经购买。幂等性处理，如果秒杀成功就去占位置  格式:userId_sessionId_skuId
+              //setNx 原子操作，判断是否存在
+//              String userId = JwtUtils.getMemberIdFromToken(token);
+              Map<String, String> memberInfo = JwtUtils.getUserIdByJwtToken(request);
+              String userId="";
+              String username="";
+              if(CollectionUtils.isEmpty(memberInfo)){
+                return null;
+              }
+              userId = memberInfo.get("id");
+              username = memberInfo.get("username");
+              String redisKey=userId+skuIdFromRedis;
+              Boolean aBoolean = redisTemplate.opsForValue().setIfAbsent(redisKey, num.toString(), ttl, TimeUnit.MILLISECONDS);
+              if(aBoolean){
+                //如果占位成功说明没有买过
+                RSemaphore semaphore = redissonClient.getSemaphore(SKU_STOCK_SEMAPHORE);
+                //快速尝试，能否获取当前所需要的数量
+                try {
+                  boolean tryAcquire = semaphore.tryAcquire(num, 100, TimeUnit.MILLISECONDS);
+                  //获取下单，发送MQ
+                  String idStr = IdWorker.getIdStr();  //订单号
+                  SeckillQuickOrderTo seckillQuickOrderTo = new SeckillQuickOrderTo();
+                  seckillQuickOrderTo.setOrderSn(idStr);
+                  seckillQuickOrderTo.setNum(num);
+                  seckillQuickOrderTo.setSkuId(seckillRedisTo.getSkuId());
+                  seckillQuickOrderTo.setMemberId(userId);
+                  seckillQuickOrderTo.setUsername(username);
+                  seckillQuickOrderTo.setSeckillPrice(seckillQuickOrderTo.getSeckillPrice());
+                  seckillQuickOrderTo.setPromotionSessionId(seckillQuickOrderTo.getPromotionSessionId());
+                  rabbitTemplate.convertAndSend("order-event-exchange","order.seckill.order",seckillQuickOrderTo);
+                  return idStr;
+                } catch (InterruptedException e) {
+                  log.info("未能获取到信号量{}", e.getMessage());
+                  return null;
+
+                }
+              }else {
+                //没买过
+              }
+            }
+        }else {
+          return null;
+        }
+      }else {
+        return null;
+      }
+    }
     return null;
   }
 }

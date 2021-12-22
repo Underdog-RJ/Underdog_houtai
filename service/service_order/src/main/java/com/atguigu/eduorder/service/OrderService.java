@@ -1,5 +1,6 @@
 package com.atguigu.eduorder.service;
 
+import com.atguigu.commonutils.order.SeckillQuickOrderTo;
 import com.atguigu.eduorder.entity.Order;
 import com.atguigu.eduorder.entity.vo.OrderQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -20,4 +21,6 @@ public interface OrderService extends IService<Order> {
     String createOrders(String courseId, String memberIdByJwtToken);
 
     IPage<Order> findAll(Long page, Long limit, OrderQuery orderQuery);
+
+    void createSeckillOrder(SeckillQuickOrderTo seckillQuickOrderTo);
 }

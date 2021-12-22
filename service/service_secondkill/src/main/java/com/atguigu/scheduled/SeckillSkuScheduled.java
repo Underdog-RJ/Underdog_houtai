@@ -34,7 +34,7 @@ public class SeckillSkuScheduled {
   2.在业务逻辑内，添加过的商品不用重复添加
  */
 
-  @Scheduled(cron = "*/3 * * * * ?")
+  @Scheduled(cron = "* * 3 * * ?")
   public void uploadSeckillSkuLastest3Days(){
     //1.重复上架无需处理
     log.info("上架商品的秒杀信息");

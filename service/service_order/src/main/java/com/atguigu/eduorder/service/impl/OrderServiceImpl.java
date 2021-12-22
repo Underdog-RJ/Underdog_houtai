@@ -2,12 +2,14 @@ package com.atguigu.eduorder.service.impl;
 
 
 
+import com.atguigu.commonutils.order.SeckillQuickOrderTo;
 import com.atguigu.eduorder.client.EduClient;
 import com.atguigu.eduorder.client.UcenterClient;
 import com.atguigu.eduorder.entity.CourseWebVoOrder;
 import com.atguigu.eduorder.entity.Order;
 import com.atguigu.eduorder.entity.UcenterMemberOrder;
 import com.atguigu.eduorder.entity.vo.OrderQuery;
+import com.atguigu.eduorder.enumPackage.OrderStatus;
 import com.atguigu.eduorder.mapper.OrderMapper;
 import com.atguigu.eduorder.service.OrderService;
 import com.atguigu.eduorder.utils.OrderNoUtil;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -102,6 +105,27 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Page<Order> ipage=new Page<>(page,limit);
 
         return orderMapper.selectPage(ipage, wrapper);
+
+    }
+
+
+    @Override
+    public void createSeckillOrder(SeckillQuickOrderTo seckillQuickOrderTo) {
+        //Todo 保存订单信息
+        Order order=new Order();
+        order.setOrderNo(seckillQuickOrderTo.getOrderSn());
+        order.setMemberId(seckillQuickOrderTo.getMemberId());
+        order.setStatus(OrderStatus.UNPID.getFlag());
+        BigDecimal totalFee = seckillQuickOrderTo.getSeckillPrice().multiply(new BigDecimal("" + seckillQuickOrderTo.getNum()));
+        order.setTotalFee(totalFee);
+        CourseWebVoOrder courseInfoOrder = eduClient.getCourseInfoOrder(seckillQuickOrderTo.getSkuId());
+
+        order.setTeacherName(courseInfoOrder.getTeacherName());
+        order.setCourseCover(courseInfoOrder.getCover());
+        order.setCourseTitle(courseInfoOrder.getTitle());
+        order.setNickname(seckillQuickOrderTo.getUsername());
+
+        this.save(order);
 
     }
 }
