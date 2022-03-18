@@ -14,6 +14,7 @@ import com.atguigu.eduservice.entity.frontvo.CourseWebVo;
 import com.atguigu.eduservice.entity.to.SeckillRedisTo;
 import com.atguigu.eduservice.service.EduChapterService;
 import com.atguigu.eduservice.service.EduCourseService;
+import com.atguigu.servicebase.anno.ValidateToken;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
@@ -68,18 +69,17 @@ public class CourseFontController {
 
     //2课程详情的方法
     @GetMapping("getFrontCourseInfo/{courseId}")
+    @ValidateToken
     public R getFrontCourseInfo(@PathVariable String courseId, HttpServletRequest request) throws ExecutionException, InterruptedException {
-
-
+        //1.根据课程id，编写sql语句查询课程信息
         CompletableFuture<CourseWebVo> futureCouseWebVo = CompletableFuture.supplyAsync(() -> {
-            //1.根据课程id，编写sql语句查询课程信息
             CourseWebVo courseWebVo = eduCourseService.getBaseCourseInfo(courseId);
             return courseWebVo;
         }, executor);
 
         //等待futureCouseWebVo完成之后在执行
+        //2.更新浏览量
         CompletableFuture<Void> futureUpdate = futureCouseWebVo.thenAcceptAsync((res) -> {
-            //2.更新浏览量
             res.setViewCount(res.getViewCount() + 1);
             EduCourse eduCourse = new EduCourse();
             BeanUtils.copyProperties(res, eduCourse);
@@ -87,24 +87,19 @@ public class CourseFontController {
         }, executor);
 
 
+        //3.根据课程Id查询章节和小节
         CompletableFuture<List<ChapterVo>> futureChapterVideoList = CompletableFuture.supplyAsync(() -> {
-            //3.根据课程Id查询章节和小节
             List<ChapterVo> chapterVideoList = eduChapterService.getChapterVideoByCourseId(courseId);
             return chapterVideoList;
         }, executor);
 
+        //4.根据课程id和用户id查询当前课程是否已经支付过了
         CompletableFuture<Object> futureBuyCouse = CompletableFuture.supplyAsync(() -> {
-            //4.根据课程id和用户id查询当前课程是否已经支付过了
             String memberId = JwtUtils.getMemberIdByJwtToken(request);
-            if (StringUtils.isEmpty(memberId)) {
-                return R.ok().code(28004);
-            }
-            boolean buyCourse = ordersClient.isBuyCourse(courseId, memberId);
-            return buyCourse;
+            return ordersClient.isBuyCourse(courseId, memberId);
         }, executor);
 
-        // 查询当前商品是否参与秒杀
-
+        //5.查询当前商品是否参与秒杀
         CompletableFuture<SeckillRedisTo> isPromote = CompletableFuture.supplyAsync(() -> {
             R result = seckillClient.getSkuSeckillInfo(courseId);
             SeckillRedisTo edu = null;
@@ -116,10 +111,11 @@ public class CourseFontController {
         }, executor);
 
 
+        // 6.等待以上结果查询完成
         CompletableFuture.allOf(futureUpdate, futureChapterVideoList, futureBuyCouse, isPromote).get();
 
-
         return R.ok().data("courseWebVo", futureCouseWebVo.get()).data("chapterVideoList", futureChapterVideoList.get()).data("isBuy", futureBuyCouse.get()).data("isPromote", isPromote);
+
     }
 
     //根据课程id查询课程信息

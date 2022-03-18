@@ -16,7 +16,7 @@ public class MyRedissonConfig {
   public RedissonClient redisson(){
     //1.创建配置
     Config config=new Config();
-    config.useSingleServer().setAddress("redis://39.101.196.37:5050").setDatabase(0).setPassword("zhangzhengxu123.");
+    config.useSingleServer().setAddress("redis://10.1.1.147:6379").setDatabase(0);
     //2.根据config创建出RedissonClient示例
     RedissonClient redissonClient = Redisson.create(config);
     return redissonClient;
