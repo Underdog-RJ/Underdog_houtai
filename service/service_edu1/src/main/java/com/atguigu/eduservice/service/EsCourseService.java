@@ -6,4 +6,8 @@ import com.atguigu.commonutils.R;
 public interface EsCourseService {
     R list(int page, int size, CourseSearchParam courseSearchParam);
 
+    R searchTop();
+
+
+    R updateKeyWord(String keyword);
 }

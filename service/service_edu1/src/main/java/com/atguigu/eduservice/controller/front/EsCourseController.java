@@ -14,8 +14,17 @@ public class EsCourseController {
     @Autowired
     EsCourseService esCourseService;
 
+    @GetMapping("searchTop")
+    public R searchTop(){
+        return esCourseService.searchTop();
+    }
+    @PutMapping("updateKeyWord")
+    public R updateKeyWord(String keyword){
+        return esCourseService.updateKeyWord(keyword);
+    }
 
-    @GetMapping("seachList/{page}/{size}")
+
+    @PostMapping("seachList/{page}/{size}")
     public R list(@PathVariable int page,@PathVariable int size, CourseSearchParam courseSearchParam){
 
         return esCourseService.list(page,size,courseSearchParam);

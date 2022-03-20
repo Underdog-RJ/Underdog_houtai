@@ -38,10 +38,13 @@ public class CrmBanner implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     *
+     */
     @ApiModelProperty(value = "ID")
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
-    @NotNull(message = "修改必须指定品牌id",groups = {UpdateGroup.class})
-    @Null(message = "新增不能指定id",groups = {AddGroup.class})
+    @NotNull(message = "修改必须指定品牌id",groups = {UpdateGroup.class}) // 更新组时不为空
+    @Null(message = "新增不能指定id",groups = {AddGroup.class}) // 添加时为空
     private String id;
 
     @ApiModelProperty(value = "标题")
