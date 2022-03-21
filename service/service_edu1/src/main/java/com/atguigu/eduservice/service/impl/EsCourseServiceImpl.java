@@ -2,21 +2,23 @@ package com.atguigu.eduservice.service.impl;
 
 import com.atguigu.commonutils.R;
 
+import com.atguigu.eduservice.entity.AllSearchEntity;
 import com.atguigu.eduservice.entity.CourseSearchParam;
 import com.atguigu.eduservice.entity.EduPub;
+import com.atguigu.eduservice.enumpackage.IndexEnum;
 import com.atguigu.eduservice.service.EsCourseService;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,12 +29,16 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 @Service
 public class EsCourseServiceImpl implements EsCourseService {
 
     @Value("${underdog.course.index}")
     private String index;
+
+    @Value("${underdog.course.allSearch}")
+    private String allSearch;
 
     @Value("${underdog.course.type}")
     private String type;
@@ -123,7 +129,6 @@ public class EsCourseServiceImpl implements EsCourseService {
             long totalHits = hits.totalHits;
             List<EduPub> list = new ArrayList<>();
             SearchHit[] searchHits = hits.getHits();
-
             for (SearchHit searchHit : searchHits) {
                 EduPub eduPub = new EduPub();
                 Map<String, Object> sourceAsMap = searchHit.getSourceAsMap();
@@ -177,5 +182,61 @@ public class EsCourseServiceImpl implements EsCourseService {
             score = 0d;
         redisTemplate.opsForZSet().add(PREFIX_RANK, keyword, score + 1);
         return R.ok().message("添加成功");
+    }
+
+    @Override
+    public R allSearch(String keyword) {
+        //创建搜索请求对象
+        SearchRequest searchRequest = new SearchRequest(allSearch.split(","));
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        searchSourceBuilder.fetchSource(new String[]{}, new String[]{"content"});
+        MultiMatchQueryBuilder multiMatchQueryBuilder = QueryBuilders.multiMatchQuery(keyword, "title", "description", "content", "author_nickname", "teacher_name").minimumShouldMatch("70%").boost(10);
+        boolQueryBuilder.must(multiMatchQueryBuilder);
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.preTags("<font class='eslight'>");
+        highlightBuilder.postTags("</front>");
+        // 设置高亮字段
+        highlightBuilder.fields().add(new HighlightBuilder.Field("title"));
+        searchSourceBuilder.highlighter(highlightBuilder);
+
+        searchSourceBuilder.query(boolQueryBuilder);
+        searchRequest.source(searchSourceBuilder);
+
+        List<Map<String, Object>> course = new ArrayList<>();
+        List<Map<String, Object>> blog = new ArrayList<>();
+        try {
+            SearchResponse search = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits hits = search.getHits();
+            SearchHit[] targetTotal = hits.getHits();
+            for (SearchHit documentFields : targetTotal) {
+                String index = documentFields.getIndex();
+                Map<String, Object> sourceAsMap = documentFields.getSourceAsMap();
+                String title = (String) sourceAsMap.get("title");
+                // 设置高亮字段
+                Map<String, HighlightField> highlightFields = documentFields.getHighlightFields();
+                if (highlightFields != null) {
+                    HighlightField highlightFieldName = highlightFields.get("title");
+                    if (highlightFieldName != null) {
+                        Text[] fragments = highlightFieldName.fragments();
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Text fragment : fragments) {
+                            stringBuilder.append(fragment);
+                        }
+                        title = stringBuilder.toString();
+                    }
+                }
+                sourceAsMap.put("title", title);
+                if (Objects.equals(index, IndexEnum.COURSE_INDEX.getName())) {
+                    course.add(sourceAsMap);
+                } else if (Objects.equals(index, IndexEnum.BLOG_INDEX.getName())) {
+                    blog.add(sourceAsMap);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        AllSearchEntity build = AllSearchEntity.builder().course(course).blog(blog).build();
+        return R.ok().data("allSearch", build);
     }
 }

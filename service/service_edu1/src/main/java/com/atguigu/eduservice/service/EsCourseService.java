@@ -10,4 +10,6 @@ public interface EsCourseService {
 
 
     R updateKeyWord(String keyword);
+
+    R allSearch(String keyword);
 }
