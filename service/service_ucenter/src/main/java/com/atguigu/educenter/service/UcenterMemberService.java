@@ -73,4 +73,5 @@ public interface UcenterMemberService extends IService<UcenterMember> {
 
     R getWeather(String location);
 
+    R getUserSignInfo(Integer year, Integer month, HttpServletRequest request);
 }
