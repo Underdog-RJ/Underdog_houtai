@@ -7,6 +7,8 @@ import com.atguigu.eduservice.entity.BlogEnjoy;
 import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.service.BlogEnjoyService;
 
+import com.atguigu.servicebase.anno.ValidateToken;
+import com.atguigu.servicebase.entity.PageObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -22,7 +24,7 @@ import java.util.List;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author Zhang zhengxu
@@ -37,20 +39,19 @@ public class BlogEnjoyController {
 
     //添加收藏
     @GetMapping("enjoyBlog/{id}")
-    public R blogEnjoy(@PathVariable String id, HttpServletRequest request){
+    public R blogEnjoy(@PathVariable String id, HttpServletRequest request) {
         Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
-        if(userIdByJwtToken==null){
+        if (userIdByJwtToken == null) {
             return R.ok().code(28004);
         }
         String userId = userIdByJwtToken.get("id");
-        if(StringUtils.isEmpty(userId))
-        {
+        if (StringUtils.isEmpty(userId)) {
             return R.ok().code(28004);
         }
         boolean flag = blogEnjoyService.addEnjoy(id, userId);
-        if(flag){
+        if (flag) {
             return R.ok();
-        }else {
+        } else {
             return R.error();
         }
 
@@ -58,66 +59,56 @@ public class BlogEnjoyController {
 
     //是否已经喜欢
     @GetMapping("IsEnjoyBlog/{id}")
-    public R IsEnjoyBlog(@PathVariable String id, HttpServletRequest request){
+    public R IsEnjoyBlog(@PathVariable String id, HttpServletRequest request) {
         Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
-        if(StringUtils.isEmpty(userIdByJwtToken)){
+        if (StringUtils.isEmpty(userIdByJwtToken)) {
             return R.ok();
         }
         String userId = userIdByJwtToken.get("id");
-        if(StringUtils.isEmpty(userId))
-        {
+        if (StringUtils.isEmpty(userId)) {
             return R.ok().code(28004);
         }
         boolean flag = blogEnjoyService.isEnjoy(id, userId);
-        if(flag){
-            return R.ok();
-        }else {
-            return R.error();
-        }
+        return R.ok().data("flag", flag);
+
 
     }
 
     //取消喜欢已经喜欢
     @GetMapping("RemoveEnjoyBlog/{id}")
-    public R RemoveEnjoyBlog(@PathVariable String id, HttpServletRequest request){
+    public R RemoveEnjoyBlog(@PathVariable String id, HttpServletRequest request) {
         Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
-
         String userId = userIdByJwtToken.get("id");
-        if(StringUtils.isEmpty(userId))
-        {
+        if (StringUtils.isEmpty(userId)) {
             return R.ok().code(28004);
         }
         boolean flag = blogEnjoyService.RemoveEnjoyBlog(id, userId);
-        if(flag){
-            return R.ok();
-        }else {
-            return R.error();
-        }
+        return R.ok().data("flag", flag);
 
     }
 
     //取消喜欢已经喜欢
-    @GetMapping("EnjoyBlogList")
-    public R EnjoyBlogList( HttpServletRequest request){
+    @GetMapping("EnjoyBlogList/{page}/{size}")
+    @ValidateToken
+    public R EnjoyBlogList(@PathVariable Integer page, @PathVariable Integer size, HttpServletRequest request) {
         Map<String, String> userIdByJwtToken = JwtUtils.getUserIdByJwtToken(request);
         String userId = userIdByJwtToken.get("id");
-      List<EduBlog> list=blogEnjoyService.enjoyList(userId);
-      return R.ok().data("list",list);
-
+        PageObject<EduBlog> list = blogEnjoyService.enjoyList(userId, page, size);
+        return R.ok().data("list", list);
     }
 
     //根据用户Id获取收藏的列表
-    @GetMapping("EnjoyBlogListByUserId/{userId}")
-    public R EnjoyBlogListByUserId(@PathVariable String userId){
-        List<EduBlog> list=blogEnjoyService.enjoyList(userId);
-        return R.ok().data("list",list);
-
-    }
+//    @GetMapping("EnjoyBlogListByUserId/{userId}")
+//    public R EnjoyBlogListByUserId(@PathVariable String userId) {
+//        List<EduBlog> list = blogEnjoyService.enjoyList(userId);
+//        return R.ok().data("list", list);
+//
+//    }
 
     @GetMapping("getEnjoyCount/{userId}")
-    public Integer EnjoyBlogCountById(@PathVariable String userId){
-        QueryWrapper<BlogEnjoy> wrapper=new QueryWrapper<>();
-        wrapper.eq("user_id",userId);
+    public Integer EnjoyBlogCountById(@PathVariable String userId) {
+        QueryWrapper<BlogEnjoy> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", userId);
         int count = blogEnjoyService.count(wrapper);
         return count;
     }

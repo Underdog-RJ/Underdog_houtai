@@ -2,6 +2,7 @@ package com.atguigu.eduservice.service;
 
 import com.atguigu.eduservice.entity.BlogEnjoy;
 import com.atguigu.eduservice.entity.EduBlog;
+import com.atguigu.servicebase.entity.PageObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface BlogEnjoyService extends IService<BlogEnjoy> {
     boolean RemoveEnjoyBlog(String id, String userId);
 
     List<EduBlog> enjoyList(String userId);
+
+    PageObject<EduBlog> enjoyList(String userId, Integer page, Integer size);
 }

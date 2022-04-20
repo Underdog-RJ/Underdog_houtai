@@ -2,6 +2,7 @@ package com.atguigu.servicebase.exception;
 
 public enum BizCodeEnume {
     UNKNOW_EXCEPTION(10000,"系统位置异常"),
+    UNLOGIN_EXCEPTION(28004,"用户未登录"),
     VALID_EXCEPTION(10000,"参数格式检验异常"),
     IDERROR_EXCEPTION(10001,"查询不到该对象");
 

@@ -8,7 +8,7 @@ import com.atguigu.eduservice.entity.UcenterMemberPay;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.atguigu.eduservice.mapper.EduBlogMapper;
 import com.atguigu.eduservice.service.EduBlogService;
-import com.atguigu.eduservice.service.EduChapterService;
+import com.atguigu.servicebase.entity.PageObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -28,7 +28,7 @@ import java.util.Objects;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author Zhang zhengxu
@@ -41,77 +41,73 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     private EduBlogMapper eduBlogMapper;
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private UcenterClient ucenterClient;
 
     @Override
     public IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery, HttpServletRequest request) {
-        Page<EduBlog> blogPage=new Page<>(page,limit);
-        QueryWrapper<EduBlog> wrapper =new QueryWrapper<>();
+        Page<EduBlog> blogPage = new Page<>(page, limit);
+        QueryWrapper<EduBlog> wrapper = new QueryWrapper<>();
         String title = blogQuery.getTitle();
         String begin = blogQuery.getBegin();
         String end = blogQuery.getEnd();
         String flag = blogQuery.getFlag();
 
-        if(!StringUtils.isEmpty(title)){
-            wrapper.like("title",title);
+        if (!StringUtils.isEmpty(title)) {
+            wrapper.like("title", title);
         }
-        if(!StringUtils.isEmpty(begin))
-        {
+        if (!StringUtils.isEmpty(begin)) {
             //构造模糊查询条件
-            wrapper.ge("gmt_create",begin);
+            wrapper.ge("gmt_create", begin);
         }
-        if(!StringUtils.isEmpty(end))
-        {
+        if (!StringUtils.isEmpty(end)) {
             //构造模糊查询条件
-            wrapper.le("gmt_modified",end);
+            wrapper.le("gmt_modified", end);
         }
-        if(!StringUtils.isEmpty(flag)){
-            wrapper.eq("flag",flag);
+        if (!StringUtils.isEmpty(flag)) {
+            wrapper.eq("flag", flag);
         }
         //排序
         wrapper.orderByDesc("gmt_create");
         Map<String, String> map = JwtUtils.getUserIdByJwtToken(request);
-        if(!Objects.equals(map.get("nickname"),"admin")){
-            wrapper.eq("author_id",map.get("id"));
+        if (!Objects.equals(map.get("nickname"), "admin")) {
+            wrapper.eq("author_id", map.get("id"));
         }
-        return eduBlogMapper.selectPage(blogPage,wrapper);
+        return eduBlogMapper.selectPage(blogPage, wrapper);
     }
 
 
     @Override
     public Map<String, Object> findBypageFront(long page, long limit, BlogQuery blogQuery) {
-        QueryWrapper<EduBlog> wrapper=new QueryWrapper<>();
+        QueryWrapper<EduBlog> wrapper = new QueryWrapper<>();
         String title = blogQuery.getTitle();
         String begin = blogQuery.getBegin();
         String end = blogQuery.getEnd();
         String flag = blogQuery.getFlag();
-        if(!StringUtils.isEmpty(blogQuery.getSubjectParentId())){//一级分类
-            wrapper.eq("subject_parent_id",blogQuery.getSubjectParentId());
+        if (!StringUtils.isEmpty(blogQuery.getSubjectParentId())) {//一级分类
+            wrapper.eq("subject_parent_id", blogQuery.getSubjectParentId());
         }
         if (!StringUtils.isEmpty(blogQuery.getSubjectId())) {
             wrapper.eq("subject_id", blogQuery.getSubjectId());
         }
-        if(!StringUtils.isEmpty(title)){
-            wrapper.like("title",title);
+        if (!StringUtils.isEmpty(title)) {
+            wrapper.like("title", title);
         }
-        if(!StringUtils.isEmpty(begin))
-        {
+        if (!StringUtils.isEmpty(begin)) {
             //构造模糊查询条件
-            wrapper.ge("gmt_create",begin);
+            wrapper.ge("gmt_create", begin);
         }
-        if(!StringUtils.isEmpty(end))
-        {
+        if (!StringUtils.isEmpty(end)) {
             //构造模糊查询条件
-            wrapper.le("gmt_modified",end);
+            wrapper.le("gmt_modified", end);
         }
-        if(!StringUtils.isEmpty(flag)){
-            wrapper.eq("flag",flag);
+        if (!StringUtils.isEmpty(flag)) {
+            wrapper.eq("flag", flag);
         }
-        Page<EduBlog> blogPage=new Page<>(page,limit);
-        baseMapper.selectPage(blogPage,wrapper);
+        Page<EduBlog> blogPage = new Page<>(page, limit);
+        baseMapper.selectPage(blogPage, wrapper);
         List<EduBlog> records = blogPage.getRecords();
         long current = blogPage.getCurrent();
         long pages = blogPage.getPages();
@@ -132,16 +128,22 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     }
 
     @Override
-    public List<EduBlog> getBlogByUserId(String id) {
-
-        return eduBlogMapper.getBlogByUserId(id);
+    public PageObject getBlogByUserId(String id, Integer page, Integer size) {
+        QueryWrapper<EduBlog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(EduBlog::getAuthorId, id);
+        Page<EduBlog> pageObj = new Page<>(page, size);
+        IPage<EduBlog> iPage = eduBlogMapper.selectPage(pageObj, queryWrapper);
+        PageObject<EduBlog> pageObject = new PageObject<>();
+        pageObject.setResults(iPage.getRecords());
+        pageObject.setTotal(iPage.getTotal());
+        return pageObject;
 
     }
 
     @Override
     public R addBlogInfo(EduBlog eduBlog, HttpServletRequest request) {
-        Map<String,String> user = JwtUtils.getUserIdByJwtToken(request);
-        if(StringUtils.isEmpty(user)){
+        Map<String, String> user = JwtUtils.getUserIdByJwtToken(request);
+        if (StringUtils.isEmpty(user)) {
             return R.error();
         }
         String id = user.get("id");
@@ -157,16 +159,16 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         //检测用户今天是否已经签到
         boolean flag = checkSign(id, LocalDate.now());
         UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(id);
-        if(!flag){
+        if (!flag) {
             //没签到则更新为签到，并且更改用户的u币
-            doSign(id,LocalDate.now());
+            doSign(id, LocalDate.now());
 
             Integer uCoin = ucenterPay.getUCoin();
-            ucenterPay.setUCoin(uCoin+10);
-            ucenterClient.updateUseruCoin(uCoin+10,request.getHeader("token"));
+            ucenterPay.setUCoin(uCoin + 10);
+            ucenterClient.updateUseruCoin(uCoin + 10, request.getHeader("token"));
         }
 
-        return R.ok().data("userInfo",ucenterPay);
+        return R.ok().data("userInfo", ucenterPay);
     }
 
     public boolean doSign(String uid, LocalDate date) {
@@ -181,10 +183,9 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     }
 
 
-
-
     /**
      * String.format()  %s代表字符串，%d代表数字
+     *
      * @param uid
      * @param date
      * @return
@@ -200,10 +201,6 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     private static String formatDate(LocalDate date, String pattern) {
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
-
-
-
-
 
 
 }

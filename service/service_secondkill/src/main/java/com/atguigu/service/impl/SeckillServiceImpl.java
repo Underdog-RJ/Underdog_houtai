@@ -204,7 +204,7 @@ public class SeckillServiceImpl implements SeckillService {
       }
     }
 
-    return null;
+    return R.ok().data("edu","");
   }
 
 
