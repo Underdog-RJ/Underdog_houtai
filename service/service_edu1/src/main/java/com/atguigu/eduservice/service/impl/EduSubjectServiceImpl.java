@@ -46,10 +46,10 @@ import java.util.stream.Collectors;
  *          CacheAutoConfiguration会导入RedisCacheConfiguretion
  *          自动配置好缓存管理器RedisCacheManger
  *      2.配置使用redis作为缓存
+ *          spring.cache.type = redis
  * 3.测试使用缓存
  *          @Cacheable 触发将数据库保存到缓存中
  *          @CacheEvict 触发将缓存删除的操作
- *
  *          @CachePut 不影响方法执行更新缓存  双写模式写，必须有返回值
  *          @Cacheing 组合以上多个操作
  *          @CacheCongig 在类级别共享缓存的相同配置
