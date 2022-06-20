@@ -196,7 +196,6 @@ public class ProxyConfig implements Serializable {
         queryWrapper.lambda().eq(Client::getClientKey, clientKey);
         Client client = clientMapper.selectOne(queryWrapper);
         return client == null ? null : client.getInetPort();
-//        return clientInetPortMapping.get(clientKey);
     }
 
 

@@ -7,6 +7,7 @@ import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
 import com.atguigu.eduservice.mapper.EduBlogMapper;
 import com.atguigu.eduservice.service.EduBlogService;
+import com.atguigu.servicebase.anno.ValidateToken;
 import com.atguigu.servicebase.entity.PageObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -51,8 +52,6 @@ public class EduBlogController {
 
     @PostMapping("pageBlogCondition/{page}/{limit}")
     public R findAllBlog(@PathVariable Long page, @PathVariable Long limit, @RequestBody(required = false) BlogQuery blogQuery, HttpServletRequest request) {
-
-
         IPage<EduBlog> iPage = eduBlogService.findByPage(page, limit, blogQuery, request);
         return R.ok().data("list", iPage.getRecords()).data("total", iPage.getTotal());
     }
@@ -72,8 +71,13 @@ public class EduBlogController {
     @PostMapping("addBlogInfo")
     public R addBlogInfo(@RequestBody EduBlog eduBlog, HttpServletRequest request) {
 
-
         return eduBlogService.addBlogInfo(eduBlog, request);
+    }
+
+    @DeleteMapping("deleteBlogById/{id}")
+    @ValidateToken
+    public R deleteBlogById(@PathVariable String id) {
+        return eduBlogService.deleteBlogById(id);
     }
 
     @PostMapping("getBlogByUserId/{page}/{size}")
@@ -100,11 +104,7 @@ public class EduBlogController {
     public R updateBlogInfo(@RequestBody EduBlog eduBlog) {
 
         boolean flag = eduBlogService.updateById(eduBlog);
-        if (flag) {
-            return R.ok();
-        } else {
-            return R.error();
-        }
+        return R.ok();
     }
 
     @GetMapping("test")

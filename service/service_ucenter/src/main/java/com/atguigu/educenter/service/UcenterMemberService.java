@@ -24,7 +24,7 @@ import java.util.List;
  */
 public interface UcenterMemberService extends IService<UcenterMember> {
 
-    String login(UcenterMember ucenterMember);
+    R login(UcenterMember ucenterMember);
 
     void register(RegisterVo registerVo);
 

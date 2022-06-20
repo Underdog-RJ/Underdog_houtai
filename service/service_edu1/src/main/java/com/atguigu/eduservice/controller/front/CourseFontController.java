@@ -100,21 +100,23 @@ public class CourseFontController {
         }, executor);
 
         //5.查询当前商品是否参与秒杀
-        CompletableFuture<SeckillRedisTo> isPromote = CompletableFuture.supplyAsync(() -> {
-            R result = seckillClient.getSkuSeckillInfo(courseId);
-            SeckillRedisTo edu = null;
-            if (result.getCode() == 20000) {
-                edu = JSON.parseObject(JSON.toJSONString(result.getData().get("edu")), new TypeReference<SeckillRedisTo>() {
-                });
-            }
-            return edu;
-        }, executor);
+//        CompletableFuture<SeckillRedisTo> isPromote = CompletableFuture.supplyAsync(() -> {
+//            R result = seckillClient.getSkuSeckillInfo(courseId);
+//            SeckillRedisTo edu = null;
+//            if (result.getCode() == 20000) {
+//                edu = JSON.parseObject(JSON.toJSONString(result.getData().get("edu")), new TypeReference<SeckillRedisTo>() {
+//                });
+//            }
+//            return edu;
+//        }, executor);
 
 
         // 6.等待以上结果查询完成
-        CompletableFuture.allOf(futureUpdate, futureChapterVideoList, futureBuyCouse, isPromote).get();
+//        CompletableFuture.allOf(futureUpdate, futureChapterVideoList, futureBuyCouse, isPromote).get();
+        CompletableFuture.allOf(futureUpdate, futureChapterVideoList, futureBuyCouse).get();
 
-        return R.ok().data("courseWebVo", futureCouseWebVo.get()).data("chapterVideoList", futureChapterVideoList.get()).data("isBuy", futureBuyCouse.get()).data("isPromote", isPromote);
+//        return R.ok().data("courseWebVo", futureCouseWebVo.get()).data("chapterVideoList", futureChapterVideoList.get()).data("isBuy", futureBuyCouse.get()).data("isPromote", isPromote);
+        return R.ok().data("courseWebVo", futureCouseWebVo.get()).data("chapterVideoList", futureChapterVideoList.get()).data("isBuy", futureBuyCouse.get());
 
     }
 

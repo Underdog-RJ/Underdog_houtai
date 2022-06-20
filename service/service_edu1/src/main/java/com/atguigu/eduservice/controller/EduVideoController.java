@@ -36,6 +36,10 @@ public class EduVideoController {
         }
         return R.ok().data("eduVideo",eduVideo);
     }
+    @PostMapping("addVideoUrl")
+    public R addVideoUrl(@RequestBody EduVideo eduVideo){
+       return eduVideoService.addVideoUrl(eduVideo);
+    }
 
 
     //添加小节

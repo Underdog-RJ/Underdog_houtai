@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,6 +75,7 @@ public class BlogEnjoyServiceImpl extends ServiceImpl<BlogEnjoyMapper, BlogEnjoy
     @Override
     public List<EduBlog> enjoyList(String userId) {
         QueryWrapper<BlogEnjoy> wrapper = new QueryWrapper<>();
+
         wrapper.eq("user_id", userId);
         List<BlogEnjoy> blogEnjoys = blogEnjoyMapper.selectList(wrapper);
         List<String> result = blogEnjoys.stream().map(blogEnjoy -> blogEnjoy.getBlogId()).collect(Collectors.toList());

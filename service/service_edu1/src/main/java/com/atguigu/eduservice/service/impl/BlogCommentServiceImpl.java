@@ -7,6 +7,9 @@ import com.atguigu.eduservice.entity.BlogComment;
 import com.atguigu.eduservice.entity.UcenterMemberPay;
 import com.atguigu.eduservice.mapper.BlogCommentMapper;
 import com.atguigu.eduservice.service.BlogCommentService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +22,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author Zhang zhengxu
@@ -29,7 +32,7 @@ import java.time.format.DateTimeFormatter;
 public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogComment> implements BlogCommentService {
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private UcenterClient ucenterClient;
@@ -38,7 +41,7 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
     @Override
     public R addCommit(BlogComment comment, HttpServletRequest request) {
         String memberId = JwtUtils.getMemberIdByJwtToken(request);
-        if(StringUtils.isEmpty(memberId)) {
+        if (StringUtils.isEmpty(memberId)) {
             return R.error().code(28004).message("请登录");
         }
         comment.setMemberId(memberId);
@@ -53,16 +56,15 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
         //检测用户今天是否已经签到
         boolean flag = checkSign(memberId, LocalDate.now());
         UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(memberId);
-        if(!flag){
+        if (!flag) {
             //没签到则更新为签到，并且更改用户的u币
-            doSign(memberId,LocalDate.now());
-
+            doSign(memberId, LocalDate.now());
             Integer uCoin = ucenterPay.getUCoin();
-            ucenterPay.setUCoin(uCoin+5);
-            ucenterClient.updateUseruCoin(uCoin+5,request.getHeader("token"));
+            ucenterPay.setUCoin(uCoin + 5);
+            ucenterClient.updateUseruCoin(uCoin + 5, request.getHeader("token"));
         }
 
-        return R.ok().data("userInfo",ucenterPay);
+        return R.ok().data("userInfo", ucenterPay).data("comment",comment);
     }
 
     public boolean doSign(String uid, LocalDate date) {
@@ -77,10 +79,9 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
     }
 
 
-
-
     /**
      * String.format()  %s代表字符串，%d代表数字
+     *
      * @param uid
      * @param date
      * @return
@@ -97,4 +98,12 @@ public class BlogCommentServiceImpl extends ServiceImpl<BlogCommentMapper, BlogC
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
 
+    @Override
+    public R commentChild(String blogId, Integer page, Integer size) {
+        QueryWrapper<BlogComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(BlogComment::getParentId, blogId);
+        IPage<BlogComment> p = new Page<>(page, size);
+        IPage<BlogComment> blogCommentIPage = baseMapper.selectPage(p, queryWrapper);
+        return R.ok().data("list", blogCommentIPage.getRecords());
+    }
 }

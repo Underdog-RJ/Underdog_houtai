@@ -1,5 +1,6 @@
 package com.atguigu.eduservice.service.impl;
 
+import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.client.VodClient;
 import com.atguigu.eduservice.entity.EduVideo;
 import com.atguigu.eduservice.mapper.EduVideoMapper;
@@ -26,29 +27,41 @@ import java.util.List;
 public class EduVideoServiceImpl extends ServiceImpl<EduVideoMapper, EduVideo> implements EduVideoService {
 
     @Autowired
+    private EduVideoMapper eduVideoMapper;
+
+    @Autowired
     private VodClient vodClient;
 
     @Override
     public void removeVideoByCourseId(String courseId) {
         //1 根据课程id查询课程所有的视频id
-        QueryWrapper wrapperVideo=new QueryWrapper();
-        wrapperVideo.eq("course_id",courseId);
+        QueryWrapper wrapperVideo = new QueryWrapper();
+        wrapperVideo.eq("course_id", courseId);
         wrapperVideo.select("video_source_id");//查询指定列
         List<EduVideo> eduVideoList = baseMapper.selectList(wrapperVideo);
 
-        List<String> videoIds=new ArrayList<>();
+        List<String> videoIds = new ArrayList<>();
         for (EduVideo eduVideo : eduVideoList) {
-            if(!StringUtils.isEmpty(eduVideo.getVideoSourceId())){
+            if (!StringUtils.isEmpty(eduVideo.getVideoSourceId())) {
                 videoIds.add(eduVideo.getVideoSourceId());
             }
         }
         //远程调用删除多个视频
-        if(videoIds.size()>0)
-        {
+        if (videoIds.size() > 0) {
             vodClient.deleteBantch(videoIds);
         }
-        QueryWrapper<EduVideo> wrapper=new QueryWrapper<>();
-        wrapper.eq("course_id",courseId);
+        QueryWrapper<EduVideo> wrapper = new QueryWrapper<>();
+        wrapper.eq("course_id", courseId);
         baseMapper.delete(wrapper);
+    }
+
+    @Override
+    public R addVideoUrl(EduVideo eduVideo) {
+        EduVideo result = eduVideoMapper.selectById(eduVideo.getId());
+        result.setVideoSourceId(eduVideo.getVideoSourceId());
+        result.setVideoOriginalName(eduVideo.getVideoOriginalName());
+        result.setVideoUrl(eduVideo.getVideoUrl());
+        eduVideoMapper.updateById(result);
+        return R.ok();
     }
 }

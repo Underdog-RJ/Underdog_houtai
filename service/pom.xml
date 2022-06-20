@@ -23,6 +23,7 @@
         <module>service_acl</module>
         <module>service_secondkill</module>
         <module>service_pierce</module>
+        <module>service_video_processor</module>
         <!--        <module>service_chat</module>-->
 <!--        <module>service-live</module>-->
     </modules>

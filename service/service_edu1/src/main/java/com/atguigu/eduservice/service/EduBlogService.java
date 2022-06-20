@@ -29,4 +29,5 @@ public interface EduBlogService extends IService<EduBlog> {
 
     R addBlogInfo(EduBlog eduBlog, HttpServletRequest request);
 
+    R deleteBlogById(String id);
 }

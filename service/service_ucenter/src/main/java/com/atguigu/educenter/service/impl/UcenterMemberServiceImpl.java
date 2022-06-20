@@ -17,6 +17,7 @@ import com.atguigu.educenter.vo.RegisterVo;
 
 import com.atguigu.educenter.vo.UcentmentberVo;
 
+import com.atguigu.servicebase.exception.BizCodeEnume;
 import com.atguigu.servicebase.exceptionhandler.GuliException;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -83,7 +84,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
     }
 
     @Override
-    public String login(UcenterMember ucenterMember) {
+    public R login(UcenterMember ucenterMember) {
 
         //获取登录手机号和密码
         String password = ucenterMember.getPassword();
@@ -91,7 +92,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
         //手机号和密码是否为空
         if (StringUtils.isEmpty(password) || StringUtils.isEmpty(mobile)) {
-            throw new GuliException(20001, "登录失败");
+            return R.ok().code(BizCodeEnume.INVALID_MOBILE.getCode()).message(BizCodeEnume.INVALID_MOBILE.getMsg());
         }
 
         //判断手机号是否正确
@@ -99,22 +100,22 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         wrapper.eq("mobile", mobile);
         UcenterMember mobieMember = baseMapper.selectOne(wrapper);
         if (mobieMember == null) {
-            throw new GuliException(20001, "登录失败");
+            return R.ok().code(BizCodeEnume.INVALID_USER.getCode()).message(BizCodeEnume.INVALID_USER.getMsg());
         }
 
         //判断密码
         if (!MD5.encrypt(password).equals(mobieMember.getPassword())) {
-            throw new GuliException(20001, "登录失败");
+            return R.ok().code(BizCodeEnume.INVALID_PASSWORD.getCode()).message(BizCodeEnume.INVALID_PASSWORD.getMsg());
         }
 
         //判断用户是否禁用
         if (mobieMember.getIsDisabled()) {
-            throw new GuliException(20001, "登录失败");
+            return R.ok().code(BizCodeEnume.INVALID_USER_ERROR.getCode()).message(BizCodeEnume.INVALID_USER_ERROR.getMsg());
         }
         //登录成功
         //生成token字符串，使用jwt工具类
         String token = JwtUtils.getJwtToken(mobieMember.getId(), mobieMember.getNickname());
-        return token;
+        return R.ok().data("token", token);
     }
 
     //注册

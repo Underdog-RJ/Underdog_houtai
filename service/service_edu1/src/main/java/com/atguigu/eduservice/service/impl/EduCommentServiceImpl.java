@@ -3,10 +3,14 @@ package com.atguigu.eduservice.service.impl;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.client.UcenterClient;
+import com.atguigu.eduservice.entity.BlogComment;
 import com.atguigu.eduservice.entity.EduComment;
 import com.atguigu.eduservice.entity.UcenterMemberPay;
 import com.atguigu.eduservice.mapper.EduCommentMapper;
 import com.atguigu.eduservice.service.EduCommentService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +20,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * <p>
@@ -32,12 +37,12 @@ public class EduCommentServiceImpl extends ServiceImpl<EduCommentMapper, EduComm
     private UcenterClient ucenterClient;
 
     @Autowired
-    private RedisTemplate<String,String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public R addCommit(EduComment comment, HttpServletRequest request) {
         String memberId = JwtUtils.getMemberIdByJwtToken(request);
-        if(StringUtils.isEmpty(memberId)) {
+        if (StringUtils.isEmpty(memberId)) {
             return R.error().code(28004).message("请登录");
         }
         comment.setMemberId(memberId);
@@ -52,16 +57,15 @@ public class EduCommentServiceImpl extends ServiceImpl<EduCommentMapper, EduComm
         //检测用户今天是否已经签到
         boolean flag = checkSign(memberId, LocalDate.now());
         UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(memberId);
-        if(!flag){
+        if (!flag) {
             //没签到则更新为签到，并且更改用户的u币
-            doSign(memberId,LocalDate.now());
-
+            doSign(memberId, LocalDate.now());
             Integer uCoin = ucenterPay.getUCoin();
-            ucenterPay.setUCoin(uCoin+5);
-            ucenterClient.updateUseruCoin(uCoin+5,request.getHeader("token"));
+            ucenterPay.setUCoin(uCoin + 5);
+            ucenterClient.updateUseruCoin(uCoin + 5, request.getHeader("token"));
         }
 
-        return R.ok().data("userInfo",ucenterPay);
+        return R.ok().data("userInfo", ucenterPay).data("comment", comment);
     }
 
     public boolean doSign(String uid, LocalDate date) {
@@ -76,10 +80,9 @@ public class EduCommentServiceImpl extends ServiceImpl<EduCommentMapper, EduComm
     }
 
 
-
-
     /**
      * String.format()  %s代表字符串，%d代表数字
+     *
      * @param uid
      * @param date
      * @return
@@ -96,4 +99,29 @@ public class EduCommentServiceImpl extends ServiceImpl<EduCommentMapper, EduComm
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
 
+    @Override
+    public R commentChild(String courseId, Integer page, Integer size) {
+        QueryWrapper<EduComment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(EduComment::getParentId, courseId);
+        IPage<EduComment> p = new Page<>(page, size);
+        IPage<EduComment> eduCommentIPage = baseMapper.selectPage(p, queryWrapper);
+        return R.ok().data("list", eduCommentIPage.getRecords());
+    }
+
+    @Override
+    public R deleteComment(String commentId) {
+        EduComment eduComment = baseMapper.selectById(commentId);
+        if (eduComment == null) {
+            return R.error();
+        }
+        // 顶级评论
+        if (Objects.equals("", eduComment.getParentId())) {
+            QueryWrapper<EduComment> wrapper = new QueryWrapper<>();
+            wrapper.eq("parent_id", commentId);
+            baseMapper.delete(wrapper);
+        }
+        baseMapper.deleteById(commentId);
+
+        return R.ok();
+    }
 }

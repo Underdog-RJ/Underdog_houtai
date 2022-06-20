@@ -17,4 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 public interface EduCommentService extends IService<EduComment> {
 
     R addCommit(EduComment comment, HttpServletRequest request);
+
+    R commentChild(String courseId, Integer page, Integer size);
+
+    R deleteComment(String commentId);
 }

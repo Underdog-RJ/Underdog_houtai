@@ -17,4 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 public interface BlogCommentService extends IService<BlogComment> {
 
     R addCommit(BlogComment comment, HttpServletRequest request);
+
+    R commentChild(String blogId, Integer page, Integer size);
 }

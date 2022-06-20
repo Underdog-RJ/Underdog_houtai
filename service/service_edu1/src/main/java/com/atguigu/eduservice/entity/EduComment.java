@@ -7,6 +7,8 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
+import java.util.List;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -60,6 +62,21 @@ public class EduComment implements Serializable {
     @ApiModelProperty(value = "更新时间")
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date gmtModified;
+
+
+    private String parentId;
+
+
+    @TableField(exist = false)
+    private List<EduComment> childList;
+
+    private String replayName;
+
+    @TableField(exist = false)
+    private Integer page;
+
+    @TableField(exist = false)
+    private Integer sonTotal;
 
 
 }

@@ -48,6 +48,9 @@ public class EduVideo implements Serializable {
     @ApiModelProperty(value = "原始文件名称")
     private String videoOriginalName ;
 
+
+    private String videoUrl;
+
     @ApiModelProperty(value = "排序字段")
     private Integer sort;
 

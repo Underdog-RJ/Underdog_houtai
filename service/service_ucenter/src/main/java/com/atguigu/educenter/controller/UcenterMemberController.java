@@ -7,21 +7,16 @@ import com.atguigu.commonutils.order.UcenterMemberOrder;
 import com.atguigu.educenter.entity.*;
 import com.atguigu.educenter.service.UcenterMemberService;
 import com.atguigu.educenter.service.UcenterMemberZhuyeService;
-import com.atguigu.educenter.utils.ConstantWxUtils;
-import com.atguigu.educenter.utils.HttpClientUtils;
 import com.atguigu.educenter.vo.CountInfo;
 import com.atguigu.educenter.vo.RegisterVo;
 import com.atguigu.educenter.vo.UcentmentberVo;
 
 import com.atguigu.servicebase.anno.ValidateToken;
-import com.atguigu.servicebase.exceptionhandler.GuliException;
-import com.google.gson.Gson;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -87,8 +82,7 @@ public class UcenterMemberController {
     public R loginUser(@RequestBody UcenterMember ucenterMember) {
         //调用service方法实现登录
         //返回token的值,使用jwt生成
-        String token = ucenterMemberService.login(ucenterMember);
-        return R.ok().data("token", token);
+        return ucenterMemberService.login(ucenterMember);
     }
 
     @GetMapping("thirdLogin/{code}")

@@ -3,9 +3,11 @@ package com.atguigu.eduservice.service.impl;
 import com.atguigu.commonutils.JwtUtils;
 import com.atguigu.commonutils.R;
 import com.atguigu.eduservice.client.UcenterClient;
+import com.atguigu.eduservice.entity.BlogEnjoy;
 import com.atguigu.eduservice.entity.EduBlog;
 import com.atguigu.eduservice.entity.UcenterMemberPay;
 import com.atguigu.eduservice.entity.vo.BlogQuery;
+import com.atguigu.eduservice.mapper.BlogEnjoyMapper;
 import com.atguigu.eduservice.mapper.EduBlogMapper;
 import com.atguigu.eduservice.service.EduBlogService;
 import com.atguigu.servicebase.entity.PageObject;
@@ -46,10 +48,14 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     @Autowired
     private UcenterClient ucenterClient;
 
+    @Autowired
+    private BlogEnjoyMapper blogEnjoyMapper;
+
     @Override
     public IPage<EduBlog> findByPage(Long page, Long limit, BlogQuery blogQuery, HttpServletRequest request) {
         Page<EduBlog> blogPage = new Page<>(page, limit);
         QueryWrapper<EduBlog> wrapper = new QueryWrapper<>();
+        wrapper.eq("is_deleted", 0);
         String title = blogQuery.getTitle();
         String begin = blogQuery.getBegin();
         String end = blogQuery.getEnd();
@@ -86,6 +92,8 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         String begin = blogQuery.getBegin();
         String end = blogQuery.getEnd();
         String flag = blogQuery.getFlag();
+        wrapper.eq("is_deleted", 0);
+
         if (!StringUtils.isEmpty(blogQuery.getSubjectParentId())) {//一级分类
             wrapper.eq("subject_parent_id", blogQuery.getSubjectParentId());
         }
@@ -130,7 +138,7 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
     @Override
     public PageObject getBlogByUserId(String id, Integer page, Integer size) {
         QueryWrapper<EduBlog> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(EduBlog::getAuthorId, id);
+        queryWrapper.lambda().eq(EduBlog::getAuthorId, id).eq(EduBlog::getIsDeleted, 0);
         Page<EduBlog> pageObj = new Page<>(page, size);
         IPage<EduBlog> iPage = eduBlogMapper.selectPage(pageObj, queryWrapper);
         PageObject<EduBlog> pageObject = new PageObject<>();
@@ -202,5 +210,15 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         return date.format(DateTimeFormatter.ofPattern(pattern));
     }
 
-
+    @Override
+    public R deleteBlogById(String id) {
+        EduBlog eduBlog = baseMapper.selectById(id);
+        eduBlog.setIsDeleted(1);
+        baseMapper.updateById(eduBlog);
+        // 删除这个博客对应的收受列表
+        QueryWrapper<BlogEnjoy> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(BlogEnjoy::getBlogId,id);
+        blogEnjoyMapper.delete(queryWrapper);
+        return R.ok();
+    }
 }
