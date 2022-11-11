@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Administrator
  * @version 1.0
  **/
-//@Configuration
+@Configuration
 public class ElasticsearchConfig {
 
     @Value("${underdog.elasticsearch.hostlist}")

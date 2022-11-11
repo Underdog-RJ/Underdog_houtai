@@ -22,6 +22,7 @@ public class OssController {
     //上传头像的方法
     @PostMapping
     public R uploadOssFile(MultipartFile file) {
+
         //获取上传文件 MutilpartFile
         String url=ossService.uploadFileAvatar(file);
         return R.ok().data("url",url);

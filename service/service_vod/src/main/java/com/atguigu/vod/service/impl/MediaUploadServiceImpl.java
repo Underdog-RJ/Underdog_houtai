@@ -10,6 +10,7 @@ import com.atguigu.vod.service.MediaUploadService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -202,7 +203,7 @@ public class MediaUploadServiceImpl implements MediaUploadService {
         map.put("mediaId", mediaId);
         String jsonString = JSON.toJSONString(map);
         try {
-            rabbitTemplate.convertAndSend(RabbitMQConfig.EX_MEDIA_PROCESSTASK, routingkey_media_video, jsonString);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.EX_MEDIA_PROCESSTASK, routingkey_media_video, jsonString, new CorrelationData(UUID.randomUUID().toString()));
         } catch (AmqpException e) {
             e.printStackTrace();
         }

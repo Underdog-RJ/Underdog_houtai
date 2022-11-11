@@ -92,7 +92,7 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
 
         //手机号和密码是否为空
         if (StringUtils.isEmpty(password) || StringUtils.isEmpty(mobile)) {
-            return R.ok().code(BizCodeEnume.INVALID_MOBILE.getCode()).message(BizCodeEnume.INVALID_MOBILE.getMsg());
+            return R.ok().message(BizCodeEnume.INVALID_MOBILE.getMsg());
         }
 
         //判断手机号是否正确
@@ -100,17 +100,17 @@ public class UcenterMemberServiceImpl extends ServiceImpl<UcenterMemberMapper, U
         wrapper.eq("mobile", mobile);
         UcenterMember mobieMember = baseMapper.selectOne(wrapper);
         if (mobieMember == null) {
-            return R.ok().code(BizCodeEnume.INVALID_USER.getCode()).message(BizCodeEnume.INVALID_USER.getMsg());
+            return R.ok().message(BizCodeEnume.INVALID_USER.getMsg());
         }
 
         //判断密码
         if (!MD5.encrypt(password).equals(mobieMember.getPassword())) {
-            return R.ok().code(BizCodeEnume.INVALID_PASSWORD.getCode()).message(BizCodeEnume.INVALID_PASSWORD.getMsg());
+            return R.ok().success(false).message(BizCodeEnume.INVALID_PASSWORD.getMsg());
         }
 
         //判断用户是否禁用
         if (mobieMember.getIsDisabled()) {
-            return R.ok().code(BizCodeEnume.INVALID_USER_ERROR.getCode()).message(BizCodeEnume.INVALID_USER_ERROR.getMsg());
+            return R.ok().message(BizCodeEnume.INVALID_USER_ERROR.getMsg());
         }
         //登录成功
         //生成token字符串，使用jwt工具类

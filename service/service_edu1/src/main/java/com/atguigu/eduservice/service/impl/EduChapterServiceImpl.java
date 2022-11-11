@@ -71,11 +71,8 @@ public class EduChapterServiceImpl extends ServiceImpl<EduChapterMapper, EduChap
                     BeanUtils.copyProperties(eduVideo,videoVo);
                     videoList.add(videoVo);
                 }
-
             }
-
             chapterVo.setChildren(videoList);
-
         }
 
         return finalList;

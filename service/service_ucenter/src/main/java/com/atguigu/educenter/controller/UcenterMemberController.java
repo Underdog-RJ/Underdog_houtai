@@ -39,7 +39,6 @@ public class UcenterMemberController {
 
     @GetMapping("/getWeather")
     private R getWeather(@RequestParam String location) {
-
         return ucenterMemberService.getWeather(location);
     }
 

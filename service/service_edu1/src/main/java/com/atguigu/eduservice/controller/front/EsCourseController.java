@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;
 
-//@RestController
-//@RequestMapping("/eduservice/coursefront")
+@RestController
+@RequestMapping("/eduservice/coursefront")
 public class EsCourseController {
 
 

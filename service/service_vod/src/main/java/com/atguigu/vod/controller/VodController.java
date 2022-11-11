@@ -50,12 +50,12 @@ public class VodController {
     }
 
     //上传视频到阿里云
-    @PostMapping("uploadAlyiVideo")
-    public R uploadAlyiVideo(MultipartFile file){
-        //返回上传视频的id
-        String videoId=vodService.uploaVideoAly(file);
-        return R.ok().data("videoId",videoId);
-    }
+//    @PostMapping("uploadAlyiVideo")
+//    public R uploadAlyiVideo(MultipartFile file){
+//        //返回上传视频的id
+//        String videoId=vodService.uploaVideoAly(file);
+//        return R.ok().data("videoId",videoId);
+//    }
 
     //根据视频id删除阿里云视频
     @DeleteMapping("removeAlyVideo/{id}")

@@ -47,7 +47,7 @@ public class EduCommentServiceImpl extends ServiceImpl<EduCommentMapper, EduComm
         }
         comment.setMemberId(memberId);
 
-        UcenterMemberPay ucenterInfo = ucenterClient.getUcenterPay(memberId);
+        UcenterMemberPay ucenterInfo = ucenterClient.getUcenterPay(memberId, request.getHeader("token"));
 
         comment.setNickname(ucenterInfo.getNickname());
         comment.setAvatar(ucenterInfo.getAvatar());
@@ -56,7 +56,7 @@ public class EduCommentServiceImpl extends ServiceImpl<EduCommentMapper, EduComm
 
         //检测用户今天是否已经签到
         boolean flag = checkSign(memberId, LocalDate.now());
-        UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(memberId);
+        UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(memberId, request.getHeader("token"));
         if (!flag) {
             //没签到则更新为签到，并且更改用户的u币
             doSign(memberId, LocalDate.now());

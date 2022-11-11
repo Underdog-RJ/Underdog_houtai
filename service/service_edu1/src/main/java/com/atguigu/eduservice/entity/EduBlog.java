@@ -77,5 +77,11 @@ public class EduBlog implements Serializable {
 
     private Integer isDeleted;
 
+    private Integer bLanguage;
+
+    private Integer shoucang;
+    private Integer zhangjie;
+    private String tags;
+
 
 }

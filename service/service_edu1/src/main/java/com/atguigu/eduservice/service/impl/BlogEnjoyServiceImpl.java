@@ -93,11 +93,14 @@ public class BlogEnjoyServiceImpl extends ServiceImpl<BlogEnjoyMapper, BlogEnjoy
         IPage<BlogEnjoy> blogEnjoyIPage = blogEnjoyMapper.selectPage(blogPage, wrapper);
         List<BlogEnjoy> blogEnjoys = blogEnjoyIPage.getRecords();
         List<String> result = blogEnjoys.stream().map(blogEnjoy -> blogEnjoy.getBlogId()).collect(Collectors.toList());
-
-        List<EduBlog> list = eduBlogMapper.selectBatchIds(result);
         PageObject<EduBlog> pageObject = new PageObject<>();
-        pageObject.setTotal(blogEnjoyIPage.getTotal());
-        pageObject.setResults(list);
+
+        if(result.size()!=0){
+            List<EduBlog> list = eduBlogMapper.selectBatchIds(result);
+            pageObject.setTotal(blogEnjoyIPage.getTotal());
+            pageObject.setResults(list);
+        }
+
         return pageObject;
     }
 }

@@ -5,8 +5,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UcenterClientImpl implements UcenterClient {
+
     @Override
-    public UcenterMemberPay getUcenterPay(String memberId) {
+    public UcenterMemberPay getUcenterPay(String memberId, String token) {
         return null;
     }
 
@@ -16,7 +17,7 @@ public class UcenterClientImpl implements UcenterClient {
     }
 
     @Override
-    public boolean updateUseruCoinById(Integer count, String id) {
+    public boolean updateUseruCoinById(Integer count, String id, String token) {
         return false;
     }
 }

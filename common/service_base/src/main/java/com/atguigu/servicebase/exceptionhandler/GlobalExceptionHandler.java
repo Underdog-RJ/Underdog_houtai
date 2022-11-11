@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnLoginException.class)
     @ResponseBody//返回数据
     public R UnLoginException(UnLoginException e) {
-        return R.ok().code(e.getCode()).message(e.getMsg());
+        return R.ok().code(28004).success(false).message(e.getMsg());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -50,6 +50,12 @@ public class GlobalExceptionHandler {
             errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }));
         return R.error().message(BizCodeEnume.VALID_EXCEPTION.getMsg()).data("data", errorMap);
+    }
+
+    @ExceptionHandler(InValidToken.class)
+    @ResponseBody
+    public R InValidToken() {
+        return R.ok().success(false).code(28100).message("Token过期，请重新登录");
     }
 
 }

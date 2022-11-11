@@ -2,9 +2,15 @@ package com.atguigu.vod.config;
 
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.ExchangeBuilder;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author Administrator
@@ -14,12 +20,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
+    @Autowired
+    RabbitTemplate rabbitTemplate;
+
     public static final String EX_MEDIA_PROCESSTASK = "ex_media_processor";
 
 
     //视频处理路由
     @Value("${underdog-service-manage-media.mq.routingkey-media-video}")
-    public  String routingkey_media_video;
+    public String routingkey_media_video;
 
     //消费者并发数量
     public static final int DEFAULT_CONCURRENT = 10;
@@ -27,12 +36,14 @@ public class RabbitMQConfig {
 
     /**
      * 交换机配置
+     *
      * @return the exchange
      */
     @Bean(EX_MEDIA_PROCESSTASK)
     public Exchange EX_MEDIA_VIDEOTASK() {
         return ExchangeBuilder.directExchange(EX_MEDIA_PROCESSTASK).durable(true).build();
     }
+
 
 
 }

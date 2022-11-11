@@ -31,7 +31,7 @@ import java.util.*;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
-//@Service
+@Service
 public class EsCourseServiceImpl implements EsCourseService {
 
     @Value("${underdog.course.index}")

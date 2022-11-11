@@ -166,7 +166,7 @@ public class EduBlogServiceImpl extends ServiceImpl<EduBlogMapper, EduBlog> impl
         baseMapper.insert(eduBlog);
         //检测用户今天是否已经签到
         boolean flag = checkSign(id, LocalDate.now());
-        UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(id);
+        UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(id, request.getHeader("token"));
         if (!flag) {
             //没签到则更新为签到，并且更改用户的u币
             doSign(id, LocalDate.now());

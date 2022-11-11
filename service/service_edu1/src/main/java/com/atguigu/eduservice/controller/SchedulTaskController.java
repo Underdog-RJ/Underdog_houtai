@@ -53,36 +53,36 @@ public class SchedulTaskController {
         wrapper.last("limit 8");
         List<EduBlog> list = eduBlogService.list(wrapper);
 
-        for (int i = 0; i < list.size(); i++) {
-            //第一名+100
-            if(i==0){
-                EduBlog eduBlog = list.get(i);
-                String userId = eduBlog.getAuthorId();
-                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
-                Integer uCoin = ucenterPay.getUCoin();
-                ucenterClient.updateUseruCoinById(uCoin+100,userId);
-            }
-            else if(i==1){
-                EduBlog eduBlog = list.get(i);
-                String userId = eduBlog.getAuthorId();
-                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
-                Integer uCoin = ucenterPay.getUCoin();
-                ucenterClient.updateUseruCoinById(uCoin+80,userId);
-            }
-            else if(i==2){
-                EduBlog eduBlog = list.get(i);
-                String userId = eduBlog.getAuthorId();
-                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
-                Integer uCoin = ucenterPay.getUCoin();
-                ucenterClient.updateUseruCoinById(uCoin+60,userId);
-            }else {
-                EduBlog eduBlog = list.get(i);
-                String userId = eduBlog.getAuthorId();
-                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
-                Integer uCoin = ucenterPay.getUCoin();
-                ucenterClient.updateUseruCoinById(uCoin+50,userId);
-            }
-        }
+//        for (int i = 0; i < list.size(); i++) {
+//            //第一名+100
+//            if(i==0){
+//                EduBlog eduBlog = list.get(i);
+//                String userId = eduBlog.getAuthorId();
+//                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
+//                Integer uCoin = ucenterPay.getUCoin();
+//                ucenterClient.updateUseruCoinById(uCoin+100,userId);
+//            }
+//            else if(i==1){
+//                EduBlog eduBlog = list.get(i);
+//                String userId = eduBlog.getAuthorId();
+//                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
+//                Integer uCoin = ucenterPay.getUCoin();
+//                ucenterClient.updateUseruCoinById(uCoin+80,userId);
+//            }
+//            else if(i==2){
+//                EduBlog eduBlog = list.get(i);
+//                String userId = eduBlog.getAuthorId();
+//                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
+//                Integer uCoin = ucenterPay.getUCoin();
+//                ucenterClient.updateUseruCoinById(uCoin+60,userId);
+//            }else {
+//                EduBlog eduBlog = list.get(i);
+//                String userId = eduBlog.getAuthorId();
+//                UcenterMemberPay ucenterPay = ucenterClient.getUcenterPay(userId);
+//                Integer uCoin = ucenterPay.getUCoin();
+//                ucenterClient.updateUseruCoinById(uCoin+50,userId);
+//            }
+//        }
         for (EduBlog eduBlog : list) {
             eduBlog.setGmtCreate(null);
             eduBlog.setGmtModified(null);

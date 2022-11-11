@@ -15,6 +15,8 @@ import java.util.UUID;
 
 @Service
 public class OssServiceImpl implements OssService {
+
+
     @Override
     public String uploadFileAvatar(MultipartFile file) {
         //获取阿里云存储相关常量
